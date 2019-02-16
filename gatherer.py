@@ -98,16 +98,16 @@ class Food(Entity):
     def assignfoodatts(self):
         if self.foodtype == Foodtypes.berry:
             self.amount = 1
-            self.boost = None
+            self.boost = []
         elif self.foodtype == Foodtypes.apple:
             self.amount = 2
-            self.boost = None
+            self.boost = []
         elif self.foodtype == Foodtypes.pineapple:
             self.amount = 1
             idx = np.random.choice(np.arange(0, len(list(Boosts))))
-            self.boost = Boosts[idx]
+            self.boost = []
         else:
-            self.boost = None
+            self.boost = []
             self.amount = 0
 
 

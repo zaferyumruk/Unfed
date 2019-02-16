@@ -1,8 +1,21 @@
 #%%
 
 
+class Colors():
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+    chocolate = (210, 105, 30)
+    red = (255, 0, 0)
+    green = (0, 255, 0)
+    blue = (0, 0, 255)
+    magenta = (255, 0, 255)
+#%%
+Colors.white
 
+#%%
 
+#%%
+colorset = list(colors)
 #%%
 from gatherer import Gatherer
 
