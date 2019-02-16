@@ -1,20 +1,14 @@
 #%%
 
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
-from gatherer import gatherer
-tickrate = 60
-with PyCallGraph(output=GraphvizOutput()):
-    aaron = gatherer(tickrate=tickrate, startingpos=[380, 280])
-    aaron.update()
+
 
 
 #%%
-from gatherer import gatherer
+from gatherer import Gatherer
 
 
 #%%
-dummy = gatherer()
+dummy = Gatherer()
 dummy.fatigue
 #%%
 a = None
@@ -111,6 +105,7 @@ class fatiguedrain():
         beaten = 2
         lookaround = 3
 
+fatiguedrain.move
 #%%
 import pygame
 pygame.font.get_fonts()

@@ -1,7 +1,7 @@
 import pygame
 from pygame import gfxdraw
 import numpy as np
-from gatherer import gatherer, Rules, Food
+from gatherer import Gatherer, Rules, Food, Tasks, States
 import random
 
 
@@ -46,15 +46,35 @@ def main():
     updating = False
     tickrate = Rules.tickrate
 
-    eve = gatherer(name='eve', startingpos=[100, 100])
-    adam = gatherer(name='adam', startingpos=[400, 300])
+    # eve = gatherer(name='eve', startingpos=[200, 200])
+    # adam = gatherer(name='adam', startingpos=[250, 250])
+    # adam = gatherer(name='adam1', startingpos=[np.random.randint(0,800), [np.random.randint(0,600)])
+    # adam = gatherer(name='adam1', startingpos=[np.random.randint(0,800), [np.random.randint(0,600)])
+    # adam = gatherer(name='adam1', startingpos=[np.random.randint(0,800), [np.random.randint(0,600)])
+    # adam = gatherer(name='adam1', startingpos=[np.random.randint(0,800), [np.random.randint(0,600)])
+
+    # adam.assignTask(tasks.)
+    # # eve.assignTask(tasks.wander)
+    # eve.assignTask(tasks.attackmove,[adam])
+    # gathererlist = [adam,eve]
 
     gathererlist = []
-    gathererlist.append(gatherer(name='adam', startingpos=[400, 300]))
-    gathererlist.append(gatherer(name='eve', startingpos=[420, 320]))
-    gathererlist.append(gatherer(name='cain', startingpos=[380, 280]))
-    gathererlist.append(gatherer(name='abel', startingpos=[340, 260]))
-    apple = Food(startingpos=[380, 280])
+    gathererlist.append(Gatherer(name='adam', startingpos=[np.random.randint(0,800), np.random.randint(0,600)]))
+    gathererlist.append(Gatherer(name='eve', startingpos=[np.random.randint(0,800), np.random.randint(0,600)]))
+    gathererlist.append(Gatherer(name='cain', startingpos=[np.random.randint(0,800), np.random.randint(0,600)]))
+    gathererlist.append(Gatherer(name='abel', startingpos=[np.random.randint(0,800), np.random.randint(0,600)]))
+    foodlist = []
+    foodlist.append(Food(startingpos=[380, 280]))
+
+    gathererlist[0].assignTask(Tasks.collect, foodlist[0])
+
+    def updateFoodOnBoard(food,count):
+        color1 = colors[(count) % len(colors)]
+        intpos = [int(pos) for pos in food.position]
+        nametext = labelfont.render(food.foodtype.name, False, black)
+        pygame.gfxdraw.box(gameDisplay, [intpos[0], intpos[1], 15, 15], color1)
+        gameDisplay.blit(nametext, (intpos[0], intpos[1]))
+
 
     def updateGathererOnBoard(gatherer, count):
         color1 = colors[(count) % len(colors)]
@@ -94,17 +114,27 @@ def main():
             namelabel,
             (gatherer.position[0], gatherer.position[1] - statustext.get_height()))
 
+    def custominfoHUD(text):
+        customtext = labelfont.render(text, False, black)
+        gameDisplay.blit(customtext,
+                         (200, 200))
 
     def infoHUD(dude = None, count=0):
-        watchedattrs = ['fatigue','state','backpack','stunnedleft','attackcd','score']
+        watchedattrs = [
+            'fatigue', 'state', 'backpack', 'stunnedleft', 'attackcd', 'score',
+            'currenttask','direction'
+        ]
         hy = 15
-        hx = 70
+        hx = 120
         ystart = windowsize[1] - 25
         xstart = hx * (count+1)
         if dude is not None:
             for attrname in watchedattrs:
                 attr = getattr(dude, attrname)
-                if type(attr) is float:
+                if type(attr) is list:
+                    bb = '%.2f:'*len(attr)
+                    datatext = infofont.render(bb % tuple(attr), False, black)
+                elif type(attr) is float:
                     datatext = infofont.render('%.2f' % (attr), False, black)
                 else:
                     datatext = infofont.render(str(attr), False, black)
@@ -118,6 +148,8 @@ def main():
                 gameDisplay.blit(datatext, (xstart, ystart))
                 ystart = ystart - hy
 
+    
+
     while Running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -126,8 +158,8 @@ def main():
             # if event.type == pygame.MOUSEMOTION:
             if event.type == pygame.KEYDOWN:
                 updating = True
-                for dude in gathererlist:
-                    dude.assingdirection(list(np.random.rand(2) - 0.5))
+                # for dude in gathererlist:
+                #     dude.assingdirection(list(np.random.rand(2) - 0.5))
             if event.type == pygame.KEYUP:
                 updating = False
 
@@ -135,8 +167,18 @@ def main():
 
         if updating:
             gameDisplay.fill(white)
-            dudecount = 0
             infoHUD()
+            # custominfoHUD(str(adam.evalPosition(eve)))
+            # if adam.state == states.idle:
+            #     adam.assignTask(tasks.attackmove, [eve])
+
+
+            foodcount = 0
+            for food in foodlist:
+                updateFoodOnBoard(food, foodcount)
+                foodcount = foodcount + 1
+
+            dudecount = 0
             for dude in gathererlist:
                 dude.update()
                 updateGathererOnBoard(dude, dudecount)
@@ -150,6 +192,7 @@ def main():
         clock.tick(tickrate)
 
 
+main()
 
 
 
@@ -171,6 +214,5 @@ def main():
 
 
 
-main()
 
 #%%
