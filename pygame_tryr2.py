@@ -63,13 +63,9 @@ class Field():
         intpos = [int(pos) for pos in gatherer.position]
         dirlenscale = 15
         dirtippos = [
-            int(gatherer.position[idx] +
-                gatherer.direction[idx] * dirlenscale)
-            for idx in range(len(gatherer.position))
+            int(pos + gatherer.direction[idx] * dirlenscale)
+            for idx, pos in enumerate(gatherer.position)
         ]
-        # dirangle = np.arctan(
-        #     gatherer.direction[1] / gatherer.direction[0]) / np.pi * 360 + 180
-
         nametext = self.HUDfont.render(gatherer.name, False, Colors.black)
         datatext = self.HUDfont.render(
             str(gatherer.fatigue), False, Colors.black)
@@ -95,8 +91,6 @@ class Field():
                                         intpos[1], 5, color2)
         pygame.gfxdraw.line(self.gameDisplay, intpos[0], intpos[1],
                             dirtippos[0], dirtippos[1], color2)
-        # pygame.gfxdraw.pie(gameDisplay, intpos[0], intpos[1], 15,
-        #                    int(dirangle + 15), int(dirangle - 15), color1)
         self.gameDisplay.blit(statustext,
                                 (gatherer.position[0], gatherer.position[1]))
         self.gameDisplay.blit(
