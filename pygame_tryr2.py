@@ -3,6 +3,7 @@ from pygame import gfxdraw
 import numpy as np
 from gatherer import Gatherer, Rules, Food, Tasks, States
 import random
+from collections import defaultdict
 
 class Colors():
     white = (255, 255, 255)
@@ -14,11 +15,8 @@ class Colors():
     magenta = (255, 0, 255)
 
 
-class Field():
-    def __init__(self,windowsize = [800,600]):
-
-        pygame.init()
-        pygame.font.init()
+class Surface():
+    def __init__(self, windowsize=[800, 600], caption='Unfed'):
 
         self.HUDfont = pygame.font.SysFont('Comic Sans MS', 15) #This creates a new object on which you can call the render method.
         self.labelfont = pygame.font.SysFont('Comic Sans MS', 10, True)
@@ -31,19 +29,27 @@ class Field():
         ]
         self.gameDisplay = pygame.display.set_mode(self.windowsize)
         self.gameDisplay.fill(Colors.white)
-        pygame.display.set_caption('Unfed')
-        self.clock = pygame.time.Clock()
-        self.running = True
-        self.updating = False
-        self.tickrate = Rules.tickrate
+        pygame.display.set_caption(caption)
         self.gathererlist = []
         self.foodlist = []
 
-    def addFood(self, food):
-        self.foodlist.append(food)
+    def update(self,gathererlist,foodlist) :
+        self.gameDisplay.fill(Colors.white)
+        self.infoHUD()
+        # custominfoHUD(str(adam.evalPosition(eve)))
 
-    def addGatherer(self, gatherer):
-        self.gathererlist.append(gatherer)
+        foodcount = 0
+        for food in foodlist:
+            self.updateFoodOnBoard(food, foodcount)
+            foodcount = foodcount + 1
+
+        dudecount = 0
+        for dude in gathererlist:
+            self.updateGathererOnBoard(dude, dudecount)
+            dudecount = dudecount + 1
+            self.infoHUD(dude, dudecount)
+
+        pygame.display.update()
 
     def updateFoodOnBoard(self, food, count):
         size = food.amount * 14 + len(food.boost) * 8
@@ -135,15 +141,53 @@ class Field():
                 self.gameDisplay.blit(datatext, (xstart, ystart))
                 ystart = ystart - hy
 
+
+
+
+
+class NewEra():
+    def __init__(self):
+        pygame.init()
+        pygame.font.init()
+
+        self.surface = Surface()
+
+        self.tickrate = Rules.tickrate
+        self.gathererupdatedict = defaultdict(lambda:None)
+        self.clock = pygame.time.Clock()
+        self.running = True
+        self.updating = False
+
+        self.gathererlist = []
+        self.foodlist = []
+
+        self.CreateEntities()
+
+    def CreateEntities(self):
+        self.addGatherer(Gatherer(name='adam', startingpos=self.getRandomPos()))
+        self.addGatherer(Gatherer(name='eve', startingpos=self.getRandomPos()))
+        self.addGatherer(Gatherer(name='cain', startingpos=self.getRandomPos()))
+        self.addGatherer(Gatherer(name='abel', startingpos=self.getRandomPos()))
+
+        self.addFood(Food(startingpos=self.getRandomPos()))
+        self.addFood(Food(startingpos=self.getRandomPos()))
+
     def getRandomPos(self):
         return [
-            np.random.randint(0, self.windowsize[0]),
-            np.random.randint(0, self.windowsize[1])
+            np.random.randint(0, self.surface.windowsize[0]),
+            np.random.randint(0, self.surface.windowsize[1])
         ]
 
+    def addFood(self, food):
+        self.foodlist.append(food)
 
-    def main(self):
+    def addGatherer(self, gatherer):
+        self.gathererlist.append(gatherer)
 
+    # def begin(self):
+
+    #     return
+    def begin(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -157,57 +201,51 @@ class Field():
                 if event.type == pygame.KEYUP:
                     self.updating = False
 
-            # myinfotext(3, apple.collected)
-
             if self.updating:
-                self.gameDisplay.fill(Colors.white)
-                self.infoHUD()
-                # custominfoHUD(str(adam.evalPosition(eve)))
-                # if adam.state == states.idle:
-                #     adam.assignTask(tasks.attackmove, [eve])
-
-
-                foodcount = 0
-                for food in self.foodlist:
-                    self.updateFoodOnBoard(food, foodcount)
-                    foodcount = foodcount + 1
-
-                dudecount = 0
-                for dude in self.gathererlist:
-                    dude.update()
-                    self.updateGathererOnBoard(dude, dudecount)
-                    dudecount = dudecount + 1
-                    self.infoHUD(dude, dudecount)
-                # myinfotext(3, apple.collected)
-                pygame
-
-            pygame.display.update()
-
+                self.updateSurface()
             self.clock.tick(self.tickrate)
 
 
+    def apply2Gatherer(self, gatherer, func):
+        for activegatherer in self.gathererlist:
+            if activegatherer == gatherer:
+                self.gathererupdatedict[gatherer] = func
 
-field = Field()
+    def updateSurface(self):
+        self.surface.update(self.gathererlist,self.foodlist)
 
-field.addGatherer(Gatherer(name='adam', startingpos=field.getRandomPos()))
-field.addGatherer(Gatherer(name='eve', startingpos=field.getRandomPos()))
-field.addGatherer(Gatherer(name='cain', startingpos=field.getRandomPos()))
-field.addGatherer(Gatherer(name='abel', startingpos=field.getRandomPos()))
 
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
-field.addFood(Food(startingpos=field.getRandomPos()))
+    def update(self):
+        for gatherer in self.gathererlist:
+                func = self.gathererupdatedict[gatherer]
+                if func is not None:
+                    func(self, gatherer)
+        dude.update()
 
-for gatherer in field.gathererlist:
-    gatherer.assignTask(Tasks.collect, random.choice(field.foodlist))
+    # def funcname(self, parameter_list):
 
-field.main()
+
+
+# myfield =
+
+
+
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
+
+def assignRandomCollect(field,gatherer):
+    if gatherer.state == States.idle:
+        gatherer.assignTask(Tasks.collect, random.choice(field.foodlist))
+
+myfield.apply2Gatherer(myfield.gathererlist[0], assignRandomCollect)
+
+
+myfield.live()
 
 
 

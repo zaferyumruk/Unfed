@@ -185,16 +185,6 @@ class Gatherer(Entity):
     # * TASKS
     def executeActiveTask(self):
         self.task2func[self.currenttask]()
-        # if self.currenttask == tasks.flee:
-        #     self.taskattackmove()
-        # if self.currenttask == tasks.follow:
-        #     self.taskfollow()
-        # if self.currenttask == tasks.wander:
-        #     self.taskwander()
-        # if self.currenttask == tasks.attackmove:
-        #     self.taskattackmove()
-        # if self.currenttask == tasks.flee:
-        #     self.taskattackmove()
 
     def taskfollow(self, target=None):
         self.state = States.following
