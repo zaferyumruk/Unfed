@@ -1,16 +1,8 @@
 import numpy as np
 from enum import Enum
 
-# ! check this
-def unitvec(alist):
-    norm = np.linalg.norm(alist)
-    if norm == 0.0:
-        return [0.0] * len(alist)
-    return [val / norm for val in alist]
-
-def maxnorm(alist):
-    max_entry = sum(alist)
-    return [val / max_entry for val in alist]
+from era import Rules
+from common import unitvec
 
 class ContainerStates(Enum):
     empty = 1
@@ -23,7 +15,6 @@ class Tasks(Enum):
     attackmove = 4
     escape = 5
     collect = 6
-
 
 class States(Enum):
     idle = 1
@@ -49,37 +40,16 @@ class Foodtypes(Enum):
     pineapple = 3
 
 
-class Rules():
-    tickrate = 60
-    basespeed = 75.0 / tickrate #rate, pixels
-    startingfatigue = 100.0 #value
-    eatspeed = 1.0 / tickrate #rate
-    foodspawnchance = maxnorm([50, 10, 2]) #value
-    bashstunspan = 2.0 * tickrate #timespan
-    scoremultiplier = 10 #value
-    attackcd = 1.0 * tickrate #timespan
-    backpackcap = 5.0  #value
-    reachdistance = 20.0
-    overlapdistance = 5.0
-    chance2changedir = 0.02 # utilized in taskwander
-    visionrange = 40
-    class Fatiguedrain():
-        move = 0.1  # per pixel
-        collect = 1 #per action
-        attack = 3  #per action
-        beaten = 2  #per action
-        lookaround = 3  #per action
-    class Map():
-        size = [800,600]
-        bounds = [[0, 800],[0, 600]]
-        center = [int(entry / 2) for entry in size]
-
+fooduniqueId = 0
 
 
 class Entity():
+    entityuniqueID = 0
     def __init__(self, startingpos):
         self.position = startingpos
         self.active = True
+        Entity.entityuniqueID = Entity.entityuniqueID + 1
+        self.entityuniqueID = Entity.entityuniqueID
 
 
 class Food(Entity):
@@ -145,6 +115,7 @@ class Gatherer(Entity):
         }
         self.stunnedleft = 0 # counter
         self.attackcd = 0  # counter
+        self.foodsaroundcount = 0 #debug info
 
         self.task2func = {
             None: lambda: None,
@@ -226,7 +197,7 @@ class Gatherer(Entity):
 
     def taskwander(self):
         self.state = States.moving
-        update_roll = np.random.randint(0, 1 / Rules.chance2changedir)
+        update_roll = np.random.randint(0, int(1.0 / Rules.chance2changedir))
         if not update_roll:
             self.assigndirection(list(np.random.rand(2) - 0.5))
         self.step()
@@ -238,15 +209,22 @@ class Gatherer(Entity):
             if not food.active:
                 self.taskcancel()
                 self.foodsaround.remove(food)
+                self.foodsaroundcount = len(self.foodsaround)
                 return
         self.taskfollow(food)
         collected = self.collectFood(food)
         if collected:
             self.taskcancel()
 
-    def informedfoodsaround(self,food):
-        if food not in self.foodsaround:
-            self.foodsaround.append(food)
+    def informedfoodsaround(self,foodlist):
+        for food in foodlist:
+            foodknown = food in self.foodsaround
+            if not food.active:
+                if foodknown:
+                    self.foodsaround.remove(food)
+            elif not foodknown:
+                self.foodsaround.append(food)
+        self.foodsaroundcount = len(self.foodsaround)
 
     def assignTask(self,task,args=None):
         self.currenttask = task
@@ -349,9 +327,6 @@ class Gatherer(Entity):
                 ratioextracted = 1.0
         return holdervariable, ratioextracted, state
 
-    def mathStuff(self):
-        return None
-
     def face(self,arg):
         [_,direction] = self.evalPosition(arg)
         self.assigndirection(direction)
@@ -359,18 +334,11 @@ class Gatherer(Entity):
     def evalPosition(self,arg):
         '''(distance,direction) = evalPosition(self,arg)
         arg: coords (as list) or entity'''
-        posself = self.position
-
         if type(arg) is list:
-            postarget = arg
+            direction = np.subtract(arg, self.position)
         else:
-            postarget = arg.position
-
-        direction = [postarget[idx] - posself[idx] for idx in range(len(posself))]
-        distance = 0
-        for direc in direction:
-            distance = distance + direc**2
-        distance = np.sqrt(distance)
+            direction = np.subtract(arg.position, self.position)
+        distance = np.linalg.norm(direction)
         return (distance,direction)
 
     def assigndirection(self, direction):
@@ -381,14 +349,57 @@ class Gatherer(Entity):
             return False
         return True
 
-def checkInRange(self, r, center, pos):
-    xdiff = center[0] - pos[0]
-    if abs(xdiff) > r:
-        return False
-    ydiff = center[1] - pos[1]
-    if abs(ydiff) > r:
-        return False
-    if xdiff + ydiff < r:
-        return True
-    if xdiff**2 + ydiff**2 < r**2:
-        return True
+    def getdistance(self,entity):
+        direction = np.subtract(entity.position,self.position)
+        distance = np.linalg.norm(direction)
+        return distance
+
+
+    def closestgatherer(self):
+        return self.closestentity(self.gatherersaround)
+
+    def closestfood(self,foodtype=None):
+        return self.closestentity(self._listfoodsaround(foodtype))
+
+    def _listfoodsaround(self,foodtype=None):
+        if foodtype is None:
+            return self.foodsaround
+        else:
+            filteredlist = [
+                food for food in self.foodsaround if food.foodtype == foodtype
+            ]
+            return filteredlist
+
+    def listfoodsaround(self,foodtype=None):
+        return self.sortwrtdistance(self._listfoodsaround(foodtype))
+
+    def listgatherersaround(self):
+        return self.sortwrtdistance(self.gatherersaround)
+
+    def sortwrtdistance(self,flist):
+        flist = flist
+        dlist = np.sqrt(self.entitydistance_2(flist))
+        df = sorted(zip(flist,dlist),key = lambda t: t[1])
+        return df
+
+    def iscarryingfood(self,gatherer):
+        return gatherer.backpack > 0.0
+
+    # def checkbackpack(self):
+    #     return self.backpack
+
+    # def checkstate(self):
+    #     return self.state
+
+    def closestentity(self,entitylist):
+        if len(entitylist)>0:
+            return entitylist[np.argmin(self.entitydistance_2(entitylist))]
+        else:
+            return None
+
+    def entitydistance_2(self,entitylist):
+        entitypos = [entity.position for entity in entitylist]
+        nodes = np.asarray(entitypos)
+        node = self.position
+        dist_2 = np.sum((nodes - node)**2, axis=1)
+        return dist_2

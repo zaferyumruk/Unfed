@@ -4,6 +4,8 @@ import numpy as np
 from gatherer import Gatherer, Rules, Food, Tasks, States, checkInRange
 import random
 from collections import defaultdict
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
 
 
 class Colors():
@@ -174,10 +176,9 @@ class NewEra():
         self.informfoodsaround(gatherer)
 
     def informfoodsaround(self,gatherer):
-        gatherer.foodsaround = []
         for food in self.foodlist:
             if checkInRange(gatherer.visionRange,gatherer.position,food.position):
-                gatherer.foodsaround.append(food)
+                gatherer.informedfoodsaround(food)
 
     def advanceGatherer(self,gatherer):
         func = self.gathererupdatedict[gatherer]
