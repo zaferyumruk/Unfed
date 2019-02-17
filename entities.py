@@ -1,7 +1,7 @@
 import numpy as np
 from enum import Enum
 
-from era import Rules
+from rules import Rules
 from common import unitvec
 
 class ContainerStates(Enum):
@@ -39,10 +39,6 @@ class Foodtypes(Enum):
     apple = 2
     pineapple = 3
 
-
-fooduniqueId = 0
-
-
 class Entity():
     entityuniqueID = 0
     def __init__(self, startingpos):
@@ -68,13 +64,13 @@ class Food(Entity):
 
     def assignfoodatts(self):
         if self.foodtype == Foodtypes.berry:
-            self.amount = 1
+            self.amount = 7
             self.boost = []
         elif self.foodtype == Foodtypes.apple:
-            self.amount = 2
+            self.amount = 12
             self.boost = []
         elif self.foodtype == Foodtypes.pineapple:
-            self.amount = 1
+            self.amount = 10
             idx = np.random.choice(np.arange(0, len(list(Boosts))))
             self.boost = []
         else:

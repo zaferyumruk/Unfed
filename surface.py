@@ -52,10 +52,11 @@ class Surface():
 
     def updateFoodOnBoard(self, food, count):
         count = food.entityuniqueID
+        unitsize = 2
         if food.active:
-            size = food.amount * 14 + len(food.boost) * 8
+            size = food.amount * unitsize + len(food.boost) * unitsize*2
         else:
-            size = 3
+            size = unitsize
         color1 = self.colors[(count) % len(self.colors)]
         intpos = [int(pos) for pos in food.position]
         nametext = self.labelfont.render(food.foodtype.name, False,

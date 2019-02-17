@@ -6,7 +6,7 @@ from pycallgraph.output import GraphvizOutput
 
 
 myEra = Era()
-myEra.foodrespawntickperiod = 120
+myEra.foodrespawntickperiod = 45
 
 myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))
 myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
@@ -14,7 +14,7 @@ myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
 myEra.addGatherer(Gatherer(name='cain', startingpos=myEra.getRandomPos()))
 myEra.addGatherer(Gatherer(name='abel', startingpos=myEra.getRandomPos()))
 
-for _ in range(25):
+for _ in range(15):
     myEra.addFood(Food(startingpos=myEra.getRandomPos()))
 
 # myEra.addFood(Food(startingpos=[200, 300]))
@@ -94,24 +94,24 @@ def assignRandomCollect_aggresive3(self):
 
 
 def assignRandomCollect_aggresive4(self):
-    distratio = 4
-    if self.state == States.idle or self.state == States.moving:
-        f1 = self.closestfood()
-        gat1 = self.closestgatherer()
-        if (f1 is not None):
-            fd = self.getdistance(f1)
-            gd = self.getdistance(gat1)
-            if (gd * distratio < fd) and (gat1.state != States.beaten) and (
-                    self.iscarryingfood(gat1)):
-                self.assignTask(Tasks.attackmove, gat1)
-            elif len(self.foodsaround) > 0:
-                self.assignTask(Tasks.collect, self.closestfood())
-            else:
-                self.assignTask(Tasks.wander)
-        elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
+    distratio = 2.1
+    # if self.state == States.idle or self.state == States.moving:
+    f1 = self.closestfood()
+    gat1 = self.closestgatherer()
+    if (f1 is not None):
+        fd = self.getdistance(f1)
+        gd = self.getdistance(gat1)
+        if (gd * distratio < fd) and (gat1.state != States.beaten) and (
+                self.iscarryingfood(gat1)):
             self.assignTask(Tasks.attackmove, gat1)
+        elif len(self.foodsaround) > 0:
+            self.assignTask(Tasks.collect, self.closestfood())
         else:
             self.assignTask(Tasks.wander)
+    elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
+        self.assignTask(Tasks.attackmove, gat1)
+    else:
+        self.assignTask(Tasks.wander)
 
 
 myEra.assign2Gatherer('adam', assignRandomCollect)
