@@ -1,9 +1,10 @@
 import pygame
 from pygame import gfxdraw
 import numpy as np
-from gatherer import Gatherer, Rules, Food, Tasks, States
+from gatherer import Gatherer, Rules, Food, Tasks, States, checkInRange
 import random
 from collections import defaultdict
+
 
 class Colors():
     white = (255, 255, 255)
@@ -30,8 +31,6 @@ class Surface():
         self.gameDisplay = pygame.display.set_mode(self.windowsize)
         self.gameDisplay.fill(Colors.white)
         pygame.display.set_caption(caption)
-        self.gathererlist = []
-        self.foodlist = []
 
     def update(self,gathererlist,foodlist) :
         self.gameDisplay.fill(Colors.white)
@@ -97,6 +96,8 @@ class Surface():
                                         intpos[1], 5, color2)
         pygame.gfxdraw.line(self.gameDisplay, intpos[0], intpos[1],
                             dirtippos[0], dirtippos[1], color2)
+        pygame.gfxdraw.circle(self.gameDisplay, intpos[0], intpos[1],
+                              gatherer.visionRange, color2)
         self.gameDisplay.blit(statustext,
                                 (gatherer.position[0], gatherer.position[1]))
         self.gameDisplay.blit(
@@ -109,7 +110,7 @@ class Surface():
 
     def infoHUD(self, dude=None, count=0):
         watchedattrs = [
-            'fatigue', 'state', 'backpack', 'stunnedleft', 'attackcd',
+            'foodsaround','fatigue', 'state', 'backpack', 'stunnedleft', 'attackcd',
             'score', 'currenttask', 'direction'
         ]
         hy = 15
@@ -119,7 +120,7 @@ class Surface():
         if dude is not None:
             for attrname in watchedattrs:
                 attr = getattr(dude, attrname)
-                if type(attr) is list:
+                if (type(attr) is list) and len(attr) and (checkStrConvert(attr[0],float)):
                     bb = '%.2f:' * len(attr)
                     datatext = self.infofont.render(bb % tuple(attr), False,
                                                     Colors.black)
@@ -142,9 +143,6 @@ class Surface():
                 ystart = ystart - hy
 
 
-
-
-
 class NewEra():
     def __init__(self):
         pygame.init()
@@ -161,22 +159,10 @@ class NewEra():
         self.gathererlist = []
         self.foodlist = []
 
-        self.CreateEntities()
+        self.createEntities()
 
-    def CreateEntities(self):
-        self.addGatherer(Gatherer(name='adam', startingpos=self.getRandomPos()))
-        self.addGatherer(Gatherer(name='eve', startingpos=self.getRandomPos()))
-        self.addGatherer(Gatherer(name='cain', startingpos=self.getRandomPos()))
-        self.addGatherer(Gatherer(name='abel', startingpos=self.getRandomPos()))
-
-        self.addFood(Food(startingpos=self.getRandomPos()))
-        self.addFood(Food(startingpos=self.getRandomPos()))
-
-    def getRandomPos(self):
-        return [
-            np.random.randint(0, self.surface.windowsize[0]),
-            np.random.randint(0, self.surface.windowsize[1])
-        ]
+    def createEntities(self):
+        pass
 
     def addFood(self, food):
         self.foodlist.append(food)
@@ -184,94 +170,97 @@ class NewEra():
     def addGatherer(self, gatherer):
         self.gathererlist.append(gatherer)
 
-    # def begin(self):
+    def grant2Gatherer(self,gatherer):
+        self.informfoodsaround(gatherer)
 
-    #     return
+    def informfoodsaround(self,gatherer):
+        gatherer.foodsaround = []
+        for food in self.foodlist:
+            if checkInRange(gatherer.visionRange,gatherer.position,food.position):
+                gatherer.foodsaround.append(food)
+
+    def advanceGatherer(self,gatherer):
+        func = self.gathererupdatedict[gatherer]
+        if func is not None:
+            func(self, gatherer)
+        gatherer.update()
+
     def begin(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                    # quit()
-                # if event.type == pygame.MOUSEMOTION:
                 if event.type == pygame.KEYDOWN:
                     self.updating = True
-                    # for dude in gathererlist:
-                    #     dude.assingdirection(list(np.random.rand(2) - 0.5))
                 if event.type == pygame.KEYUP:
                     self.updating = False
 
             if self.updating:
+                self.updateEntitites()
                 self.updateSurface()
+
             self.clock.tick(self.tickrate)
 
 
-    def apply2Gatherer(self, gatherer, func):
+    def assign2Gatherer(self, gatherer, func):
+        if type(gatherer) is str:
+            check = gatherer
+        else:
+            check = gatherer.name
         for activegatherer in self.gathererlist:
-            if activegatherer == gatherer:
-                self.gathererupdatedict[gatherer] = func
+            if activegatherer.name == check:
+                self.gathererupdatedict[activegatherer] = func
+
+    def updateEntitites(self):
+        randomgathererlist = self.gathererlist.copy()
+        random.shuffle(randomgathererlist)
+        for gatherer in randomgathererlist:
+            self.grant2Gatherer(gatherer)
+            self.advanceGatherer(gatherer)
 
     def updateSurface(self):
         self.surface.update(self.gathererlist,self.foodlist)
 
+    def getRandomPos(self):
+        return [
+            np.random.randint(0, self.surface.windowsize[0]),
+            np.random.randint(0, self.surface.windowsize[1])
+        ]
 
-    def update(self):
-        for gatherer in self.gathererlist:
-                func = self.gathererupdatedict[gatherer]
-                if func is not None:
-                    func(self, gatherer)
-        dude.update()
+def checkStrConvert(s,checktype):
+    try:
+        if type(s) is str:
+            checktype(s)
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
 
-    # def funcname(self, parameter_list):
+myEra = NewEra()
 
+myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))
+# myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
+# myEra.addGatherer(Gatherer(name='cain', startingpos=myEra.getRandomPos()))
+# myEra.addGatherer(Gatherer(name='abel', startingpos=myEra.getRandomPos()))
 
+myEra.addFood(Food(startingpos=myEra.getRandomPos()))
 
-# myfield =
+myEra.addFood(Food(startingpos=[200, 300]))
+myEra.addFood(Food(startingpos=[250, 350]))
+myEra.addFood(Food(startingpos=[280, 380]))
 
-
-
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-# myfield.addFood(Food(startingpos=myfield.getRandomPos()))
-
-def assignRandomCollect(field,gatherer):
+# ! field should be removed, only gatherer should do the job!
+def assignRandomCollect(field, gatherer):
     if gatherer.state == States.idle:
-        gatherer.assignTask(Tasks.collect, random.choice(field.foodlist))
-
-myfield.apply2Gatherer(myfield.gathererlist[0], assignRandomCollect)
-
-
-myfield.live()
+        if gatherer.foodsaround:
+            gatherer.assignTask(Tasks.collect, gatherer.foodsaround[0])
+        else:
+            gatherer.assignTask(Tasks.wander)
 
 
 
 
+myEra.assign2Gatherer('adam', assignRandomCollect)
 
-
-
-
-
-# quit()
-
-# crashed = False
-# while not crashed:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             crashed = True
-#         print(event)
-
-#     pygame.display.update()
-
-#     clock.tick(60)
-
-
-# def updateScreen(self):
-
-
-
-
-#%%
+myEra.begin()

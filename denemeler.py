@@ -19,7 +19,10 @@ colorset = list(colors)
 #%%
 from gatherer import Gatherer
 
+#%%
 
+#%%
+checkStrConvert('13',int)
 #%%
 dummy = Gatherer()
 dummy.fatigue

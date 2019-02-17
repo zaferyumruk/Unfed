@@ -62,6 +62,7 @@ class Rules():
     reachdistance = 20.0
     overlapdistance = 5.0
     chance2changedir = 0.02 # utilized in taskwander
+    visionrange = 40
     class Fatiguedrain():
         move = 0.1  # per pixel
         collect = 1 #per action
@@ -125,6 +126,7 @@ class Gatherer(Entity):
         self.taskvariables = []
         self.score = 0
         self.backpack = 5
+        self.visionRange = Rules.visionrange
         self.foodsaround = []
         self.gatherersaround = []
         #variables
@@ -159,9 +161,9 @@ class Gatherer(Entity):
         self.updateAttackCd()
         self.consumeFood()
         self.checkFatigue()
+        self.updateVision()
         if self.checkReadytoExecute():
             self.executeActiveTask()
-        # self.updateVision()
 
     def checkReadytoExecute(self):
         return (not self.state == States.beaten) and (not self.state == States.exhausted)
@@ -278,13 +280,21 @@ class Gatherer(Entity):
             success = True
         return success
 
-    # reveal foods in whole map
-    def lookaround(self):
-        return None
-
     def checkReach(self,other):
         [distance,direction]=self.evalPosition(other)
         return distance<Rules.reachdistance
+
+    def checkInRange(self,r,center,pos):
+        xdiff = center[0] - pos[0]
+        if abs(xdiff) > r:
+            return False
+        ydiff = center[1] - pos[1]
+        if abs(ydiff) > r:
+            return False
+        if xdiff + ydiff < r:
+            return True
+        if xdiff**2 + ydiff**2 < r**2:
+            return True
 
     # * UPDATES
     def consumeFood(self):
@@ -298,9 +308,7 @@ class Gatherer(Entity):
     # reveal foods within a vicinity, at no cost
     # ! Please call after collect food or maybe after everything else
     def updateVision(self):
-
-        return None
-
+        pass
 
     # * USEFUL BASIC FUNCTIONS
     def reducefatigue(self, fatigueloss):
