@@ -6,15 +6,15 @@ class Rules():
     startingfatigue = 300.0  #value
     eatspeed = 1.0 / tickrate  #rate
     foodspawnchance = maxnorm([50, 40, 5])  #value
-    bashstunspan = 2.0 * tickrate  #timespan
+    bashstunspan = 5.0 * tickrate  #timespan
     scoremultiplier = 10  #value
-    attackcd = 1.0 * tickrate  #timespan
+    attackcd = 3.0 * tickrate  #timespan
     backpackcap = 60.0  #value
     reachdistance = 20.0
     overlapdistance = 5.0
     chance2changedir = 0.005  # utilized in taskwander
-    visionrange = 180
-    foodrespawntickperiod = 120
+    visionrange = 120
+    foodrespawntickperiod = 40
 
     class Fatiguedrain():
         move = 0.1  # per pixel

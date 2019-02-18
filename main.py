@@ -6,7 +6,7 @@ from pycallgraph.output import GraphvizOutput
 
 
 myEra = Era()
-myEra.foodrespawntickperiod = 45
+# myEra.foodrespawntickperiod = 45
 
 myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))
 myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
@@ -53,23 +53,23 @@ def assignRandomCollect_aggresive1(self):
 
 def assignRandomCollect_aggresive2(self):
     distratio = 2
-    if self.state == States.idle or self.state == States.moving:
-        f1 = self.closestfood()
-        gat1 = self.closestgatherer()
-        if (f1 is not None):
-            fd = self.getdistance(f1)
-            gd = self.getdistance(gat1)
-            if (gd * distratio < fd) and (gat1.state != States.beaten) and (
-                    self.iscarryingfood(gat1)):
-                self.assignTask(Tasks.attackmove, gat1)
-            elif len(self.foodsaround) > 0:
-                self.assignTask(Tasks.collect, self.closestfood())
-            else:
-                self.assignTask(Tasks.wander)
-        elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
+    # if self.state == States.idle or self.state == States.moving:
+    f1 = self.closestfood()
+    gat1 = self.closestgatherer()
+    if (f1 is not None):
+        fd = self.getdistance(f1)
+        gd = self.getdistance(gat1)
+        if (gd * distratio < fd) and (gat1.state != States.beaten) and (
+                self.iscarryingfood(gat1)):
             self.assignTask(Tasks.attackmove, gat1)
+        elif len(self.foodsaround) > 0:
+            self.assignTask(Tasks.collect, self.closestfood())
         else:
             self.assignTask(Tasks.wander)
+    elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
+        self.assignTask(Tasks.attackmove, gat1)
+    else:
+        self.assignTask(Tasks.wander)
 
 
 def assignRandomCollect_aggresive3(self):
@@ -120,7 +120,5 @@ myEra.assign2Gatherer('cain', assignRandomCollect_aggresive2)
 myEra.assign2Gatherer('abel', assignRandomCollect_aggresive3)
 
 #%%
-# with PyCallGraph(output=GraphvizOutput()):
-#     myEra.begin()
-
-myEra.begin()
+with PyCallGraph(output=GraphvizOutput()):
+    myEra.begin()
