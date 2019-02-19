@@ -1,54 +1,29 @@
 #%%
 from era import Era
-from entities import States,Tasks,Food,Gatherer
+from entities import State,Task,Food,Gatherer
 from pycallgraph import PyCallGraph
 from pycallgraph.output import GraphvizOutput
 
 
-myEra = Era()
-# myEra.foodrespawntickperiod = 45
-
-myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))
-myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
-
-myEra.addGatherer(Gatherer(name='cain', startingpos=myEra.getRandomPos()))
-myEra.addGatherer(Gatherer(name='abel', startingpos=myEra.getRandomPos()))
-
-for _ in range(15):
-    myEra.addFood(Food(startingpos=myEra.getRandomPos()))
-
-# myEra.addFood(Food(startingpos=[200, 300]))
-# myEra.addFood(Food(startingpos=[250, 350]))
-# myEra.addFood(Food(startingpos=[280, 380]))
-# myEra.addFood(Food(startingpos=[350, 380]))
-
-def assignRandomCollect(gatherer):
-    if gatherer.state == States.idle or gatherer.state == States.moving:
-        if len(gatherer.foodsaround)>0:
-            gatherer.assignTask(Tasks.collect, gatherer.closestfood())
-        else:
-            gatherer.assignTask(Tasks.wander)
-
-
 def assignRandomCollect_aggresive1(self):
     distratio = 1
-    if self.state == States.idle or self.state == States.moving:
+    if self.state == State.idle or self.state == State.moving:
         f1 = self.closestfood()
         gat1 = self.closestgatherer()
         if (f1 is not None):
             fd = self.getdistance(f1)
             gd = self.getdistance(gat1)
-            if (gd * distratio < fd) and (gat1.state != States.beaten) and (
-                    self.iscarryingfood(gat1)):
-                self.assignTask(Tasks.attackmove, gat1)
-            elif len(self.foodsaround) > 0:
-                self.assignTask(Tasks.collect, self.closestfood())
+            if (gd * distratio < fd) and (gat1.state != State.beaten) and (
+                    self.foodcarried(gat1)):
+                self.assignTask(Task.attackmove, gat1)
+            elif len(self.visiblefoods()) > 0:
+                self.assignTask(Task.collect, self.closestfood())
             else:
-                self.assignTask(Tasks.wander)
-        elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
-            self.assignTask(Tasks.attackmove, gat1)
+                self.assignTask(Task.wander)
+        elif (gat1.state != State.beaten) and (self.foodcarried(gat1)):
+            self.assignTask(Task.attackmove, gat1)
         else:
-            self.assignTask(Tasks.wander)
+            self.assignTask(Task.wander)
 
 
 def assignRandomCollect_aggresive2(self):
@@ -59,38 +34,38 @@ def assignRandomCollect_aggresive2(self):
     if (f1 is not None):
         fd = self.getdistance(f1)
         gd = self.getdistance(gat1)
-        if (gd * distratio < fd) and (gat1.state != States.beaten) and (
-                self.iscarryingfood(gat1)):
-            self.assignTask(Tasks.attackmove, gat1)
-        elif len(self.foodsaround) > 0:
-            self.assignTask(Tasks.collect, self.closestfood())
+        if (gd * distratio < fd) and (gat1.state != State.beaten) and (
+                self.foodcarried(gat1)):
+            self.assignTask(Task.attackmove, gat1)
+        elif len(self.visiblefoods()) > 0:
+            self.assignTask(Task.collect, self.closestfood())
         else:
-            self.assignTask(Tasks.wander)
-    elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
-        self.assignTask(Tasks.attackmove, gat1)
+            self.assignTask(Task.wander)
+    elif (gat1.state != State.beaten) and (self.foodcarried(gat1)):
+        self.assignTask(Task.attackmove, gat1)
     else:
-        self.assignTask(Tasks.wander)
+        self.assignTask(Task.wander)
 
 
 def assignRandomCollect_aggresive3(self):
     distratio = 3
-    if self.state == States.idle or self.state == States.moving:
+    if self.state == State.idle or self.state == State.moving:
         f1 = self.closestfood()
         gat1 = self.closestgatherer()
         if (f1 is not None):
             fd = self.getdistance(f1)
             gd = self.getdistance(gat1)
-            if (gd * distratio < fd) and (gat1.state != States.beaten) and (
-                    self.iscarryingfood(gat1)):
-                self.assignTask(Tasks.attackmove, gat1)
-            elif len(self.foodsaround) > 0:
-                self.assignTask(Tasks.collect, self.closestfood())
+            if (gd * distratio < fd) and (gat1.state != State.beaten) and (
+                    self.foodcarried(gat1)):
+                self.assignTask(Task.attackmove, gat1)
+            elif len(self.visiblefoods()) > 0:
+                self.assignTask(Task.collect, self.closestfood())
             else:
-                self.assignTask(Tasks.wander)
-        elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
-            self.assignTask(Tasks.attackmove, gat1)
+                self.assignTask(Task.wander)
+        elif (gat1.state != State.beaten) and (self.foodcarried(gat1)):
+            self.assignTask(Task.attackmove, gat1)
         else:
-            self.assignTask(Tasks.wander)
+            self.assignTask(Task.wander)
 
 
 def assignRandomCollect_aggresive4(self):
@@ -101,23 +76,76 @@ def assignRandomCollect_aggresive4(self):
     if (f1 is not None):
         fd = self.getdistance(f1)
         gd = self.getdistance(gat1)
-        if (gd * distratio < fd) and (gat1.state != States.beaten) and (
-                self.iscarryingfood(gat1)):
-            self.assignTask(Tasks.attackmove, gat1)
-        elif len(self.foodsaround) > 0:
-            self.assignTask(Tasks.collect, self.closestfood())
+        if (gd * distratio < fd) and (gat1.state != State.beaten) and (
+                self.foodcarried(gat1)):
+            self.assignTask(Task.attackmove, gat1)
+        elif len(self.visiblefoods()) > 0:
+            self.assignTask(Task.collect, self.closestfood())
         else:
-            self.assignTask(Tasks.wander)
-    elif (gat1.state != States.beaten) and (self.iscarryingfood(gat1)):
-        self.assignTask(Tasks.attackmove, gat1)
+            self.assignTask(Task.wander)
+    elif (gat1.state != State.beaten) and (self.foodcarried(gat1)):
+        self.assignTask(Task.attackmove, gat1)
     else:
-        self.assignTask(Tasks.wander)
+        self.assignTask(Task.wander)
 
 
-myEra.assign2Gatherer('adam', assignRandomCollect)
-myEra.assign2Gatherer('eve', assignRandomCollect_aggresive4)
-myEra.assign2Gatherer('cain', assignRandomCollect_aggresive2)
-myEra.assign2Gatherer('abel', assignRandomCollect_aggresive3)
+def assignRandomCollect(gatherer):
+    # if gatherer.state == State.idle or gatherer.state == State.moving:
+    if len(gatherer.visiblefoods()) > 0:
+        gatherer.assignTask(Task.collect, gatherer.closestfood())
+    else:
+        gatherer.assignTask(Task.wander)
+
+
+def assignRandomCollectStop(gatherer):
+    # if gatherer.state == State.idle or gatherer.state == State.moving:
+    if len(gatherer.visiblefoods()) > 0:
+        gatherer.assignTask(Task.collect, gatherer.closestfood())
+    else:
+        gatherer.assignTask(Task.wander)
+
+
+def assignRandomCollect_aggresivetry(self):
+    distratio = 1
+    f1 = self.closestfood()
+    gat1 = self.closestgatherer()
+    if (f1 is not None):
+        fd = self.getdistance(f1)
+        gd = self.getdistance(gat1)
+        if (gd * distratio < fd) and (gat1.state != State.beaten) and (
+                self.foodcarried(gat1)):
+            self.assignTask(Task.attackmove, gat1)
+        elif len(self.knownfoods()) > 0:
+            self.assignTask(Task.collect, self.closestfood())
+        else:
+            self.assignTask(Task.wander)
+    elif (gat1.state != State.beaten) and (self.foodcarried(gat1)):
+        self.assignTask(Task.attackmove, gat1)
+    else:
+        self.assignTask(Task.wander)
+
+
+
+
+myEra = Era()
+# myEra.foodrespawntickperiod = 45
+
+# myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))
+# myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
+
+myEra.addGatherer(Gatherer(name='cain', startingpos=myEra.getRandomPos()))
+myEra.addGatherer(Gatherer(name='abel', startingpos=myEra.getRandomPos()))
+
+# myEra.addFood(Food(startingpos=[200, 300]))
+# myEra.addFood(Food(startingpos=[250, 350]))
+# myEra.addFood(Food(startingpos=[280, 380]))
+# myEra.addFood(Food(startingpos=[350, 380]))
+
+
+# myEra.assign2Gatherer('adam', assignRandomCollect_aggresive4)
+# myEra.assign2Gatherer('eve', assignRandomCollect_aggresive4)
+myEra.assign2Gatherer('cain', assignRandomCollect_aggresivetry)
+myEra.assign2Gatherer('abel', assignRandomCollect_aggresivetry)
 
 #%%
 with PyCallGraph(output=GraphvizOutput()):

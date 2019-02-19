@@ -51,7 +51,7 @@ class Surface():
         pygame.display.update()
 
     def updateFoodOnBoard(self, food, count):
-        count = food.entityuniqueID
+        count = food.uniqueID
         unitsize = 2
         if food.active:
             size = food.amount * unitsize + len(food.boost) * unitsize*2
@@ -129,7 +129,7 @@ class Surface():
 
     def infoHUD(self, dude=None, count=0):
         watchedattrs = [
-            'foodsaroundcount','fatigue', 'state', 'backpack', 'stunnedleft', 'attackcd',
+            'foodsknowncount','fatigue', 'state', 'backpack', 'stunnedleft', 'attackcd',
             'score', 'currenttask'
         ]
         hy = 15

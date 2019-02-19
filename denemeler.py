@@ -145,10 +145,10 @@ g1.closestentity(gFood)
 gFood[2]
 
 #%%
-[g1.evalPosition(ga) for ga in gFood]
+[g1._evalPosition(ga) for ga in gFood]
 
 #%%
-from entities import Gatherer,Food,Foodtypes
+from entities import Gatherer,Food,Foodtype
 from era import Era
 
 myEra = Era()
@@ -170,27 +170,33 @@ gGatherer.append(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
 
 g1 = Gatherer(name='adam', startingpos=myEra.getRandomPos())
 
-g1.foodsaround = gFood
-g1.gatherersaround = gGatherer
+g1.foodsvisible = gFood
+g1.gatherersknown = gGatherer
 
 
 #%%
-g1.listfoodsaround()
+g1.foodsvisible()
 #%%
 
-g1.getdistance(g1.foodsaround[0])
+g1.getdistance(g1.foodsvisible[0])
 
 
 #%%
-dists = [[g1.evalPosition(ga),ga.foodtype] for ga in gFood]
+dists = [[g1._evalPosition(ga),ga.foodtype] for ga in gFood]
 dists
 
 #%%
 
 #%%
-g1.getdistance(g1.listgatherersaround())
+g1.getdistance(g1.gatherersaround())
 
 #%%
 out
+
+#%%
+a = [1,2,3]
+
+#%%
+a.remove(4)
 
 #%%

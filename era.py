@@ -4,7 +4,7 @@ import random
 from collections import defaultdict
 
 from surface import Surface
-from entities import Gatherer, Food, Tasks, States
+from entities import Gatherer, Food, Task, State
 from common import checkInRange, maxnorm
 from rules import Rules
 
@@ -15,6 +15,7 @@ class Era():
 
         self.surface = Surface()
 
+        self.startingfoodcount = Rules.startingfoodcount
         self.foodrespawntickperiod = Rules.foodrespawntickperiod
         self.tickrate = Rules.tickrate
         # self.logictickperiod = int(Rules.logictickrate / Rules.tickrate)
@@ -27,33 +28,56 @@ class Era():
         self.gathererlist = []
         self.foodlist = []
 
+        self.entityIDdict = {}
+
         self.createEntities()
 
     def createEntities(self):
+        for _ in range(self.startingfoodcount):
+            self.addFood(Food(startingpos=self.getRandomPos()))
         pass
 
     def addFood(self, food):
         self.foodlist.append(food)
+        self.entityIDdict[food.uniqueID] = food
 
     def addGatherer(self, gatherer):
         self.gathererlist.append(gatherer)
+        self.entityIDdict[gatherer.uniqueID] = gatherer
+
+    # ! Implement
+    def removeFood(self, idx):
+        self.entityIDdict.pop(self.foodlist[idx].uniqueID)
+        self.foodlist.pop(idx)
+
+    # # ! Implement
+    # def removeGatherer(self, gatherer):
+    #     self.gathererlist.append(gatherer)
+    #     self.gathererIddict = {gatherer.uniqueID:gatherer}
+
+
+    def id2entity(self,id):
+        return self.entityIDdict[id]
+
+    def entity2id(self,entity):
+        return entity.uniqueID
 
     def grant2Gatherer(self,gatherer):
-        self.informfoodsaround(gatherer)
+        self.informfoodsvisible(gatherer)
 
-    def informfoodsaround(self,gatherer):
+    def informfoodsvisible(self,gatherer):
         newlist = []
         for food in self.foodlist:
             if checkInRange(gatherer.visionRange,gatherer.position,food.position):
                 newlist.append(food)
-        gatherer.informedfoodsaround(newlist)
+        gatherer.informedfoodsvisible(newlist)
 
 
-    def informgatherersaround(self, gatherer):
-        gatherer.gatherersaround = []
+    def informgatherersknown(self, gatherer):
+        gatherer.gatherersknown = []
         for gat in self.gathererlist:
             if gat!=gatherer:
-                gatherer.gatherersaround.append(gat)
+                gatherer.gatherersknown.append(gat)
 
     def advanceGatherer(self,gatherer):
         func = self.gathererupdatedict[gatherer]
@@ -64,6 +88,7 @@ class Era():
     def begin(self):
         # step = 0
         foodrespawncountdown = self.foodrespawntickperiod
+        foodgrowing = True
         self.initEntities()
         while self.running:
             # step = step + 1
@@ -74,12 +99,22 @@ class Era():
                     self.updating = True
                 if event.type == pygame.KEYUP:
                     self.updating = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.dict['button'] == 1:
+                        self.addFood(Food(startingpos=event.dict['pos']))
+                        
+                    if event.dict['button'] == 3:
+                        if foodgrowing:
+                            foodgrowing = False
+                        else:
+                            foodgrowing = True
 
             if self.updating:
                 foodrespawncountdown = foodrespawncountdown - 1
                 if foodrespawncountdown == 0:
-                    self.addFood(Food(startingpos=self.getRandomPos()))
                     foodrespawncountdown = self.foodrespawntickperiod
+                    if foodgrowing:
+                        self.addFood(Food(startingpos=self.getRandomPos()))
                 # if step >= self.logictickperiod:
                 #     self.updateEntitites()
                 #     step = 0
@@ -93,7 +128,7 @@ class Era():
             self.init4Gatherer(gatherer)
 
     def init4Gatherer(self,gatherer):
-        self.informgatherersaround(gatherer)
+        self.informgatherersknown(gatherer)
 
     def assign2Gatherer(self, gatherer, func):
         if type(gatherer) is str:
@@ -111,8 +146,8 @@ class Era():
             self.grant2Gatherer(gatherer)
             self.advanceGatherer(gatherer)
         for idx, food in enumerate(self.foodlist):
-            if not food.active:
-                self.foodlist.pop(idx)
+            if not food.active and len(food.knownby)==0:
+                self.removeFood(idx)
 
     def updateSurface(self):
         self.surface.update(self.gathererlist,self.foodlist)
