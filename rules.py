@@ -15,9 +15,10 @@ class Rules():
     overlapdistance = 5.0
     chance2changedir = 0.005  # utilized in taskwander
     visionrange = 100
-    foodrespawntickperiod = 20
-    startingfoodcount = 5
+    foodrespawntickperiod = 60
+    startingfoodcount = 20
     spawnedfoodcap = 5
+    
 
     class Fatiguedrain():
         move = 0.1  # per pixel

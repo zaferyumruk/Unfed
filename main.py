@@ -125,6 +125,12 @@ def assignRandomCollect_aggresivetry(self):
         self.assignTask(Task.wander)
 
 
+def trycollect(self):
+    f1 = self.closestgatherer()
+    if self.isvisible(f1):
+        self.assignTask(Task.escape, f1)
+    # else:
+    #     self.assignTask(Task.wander)
 
 
 myEra = Era()
@@ -133,19 +139,19 @@ myEra.startingfoodcount = 0
 
 name = 'eve'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+myEra.assign2Gatherer(name, trycollect)
 
 name = 'adam'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+myEra.assign2Gatherer(name, trycollect)
 
 name = 'cain'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+myEra.assign2Gatherer(name, trycollect)
 
 name = 'abel'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+myEra.assign2Gatherer(name, trycollect)
 
 myEra.begin()
 

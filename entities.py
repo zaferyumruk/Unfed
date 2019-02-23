@@ -72,7 +72,7 @@ class Food(Entity):
             self._boost = []
         elif self._foodtype == Foodtype.pineapple:
             self._amount = 10
-            idx = np.random.choice(np.arange(0, len(list(Boost))))
+            # idx = np.random.choice(np.arange(0, len(list(Boost))))
             self._boost = []
         else:
             self._boost = []
@@ -161,6 +161,9 @@ class Gatherer(Entity):
         self._state = State.following
         if target is None:
             target = self._taskvariables[0]
+            if target is None:
+                self._taskcancel()
+                return
         [distance,direction] = self._evalPosition(target)
         if distance > Rules.overlapdistance:
             self._assigndirection(direction)
@@ -170,12 +173,15 @@ class Gatherer(Entity):
         self._state = State.fleeing
         if target is None:
             target = self._taskvariables[0]
-        if target.active:
-            [distance,direction] = self._evalPosition(target)
-            self._assigndirection([-direc for direc in direction])
-            self._step()
-        else:
-            self._taskcancel()
+            if target is None:
+                self._taskcancel()
+                return
+        # if target._active:
+        [_,direction] = self._evalPosition(target)
+        self._assigndirection([-direc for direc in direction])
+        self._step()
+        # else:
+        #     self._taskcancel()
 
     def _taskattackmove(self):
         self._state = State.charging
@@ -200,6 +206,9 @@ class Gatherer(Entity):
     def _taskcollect(self):
         self._state = State.moving
         food = self._taskvariables[0]
+        if food is None:
+            self._taskcancel()
+            return
         if food in self._foodsvisible:
             if not food._active:
                 self._taskcancel()
@@ -270,7 +279,7 @@ class Gatherer(Entity):
         return success
 
     def _checkReach(self,other):
-        [distance,direction]=self._evalPosition(other)
+        [distance,_]=self._evalPosition(other)
         return distance<Rules.reachdistance
 
     # * UPDATES
@@ -305,7 +314,10 @@ class Gatherer(Entity):
                 self._backpack = self._backpack + foodamount
         return success
 
-    # ! direction manipulation at boundaries are problematic
+    # ! gatherersknown should be replaced with gatherersvisible when needed
+    def isvisible(self,entity):
+        return (entity in self._foodsvisible or entity in self._gatherersknown)
+
     def _step(self):
         '''uses speed and current direction'''
         fatigueloss = self._speed * Rules.Fatiguedrain.move * self._modifier['fatiguedrain']
@@ -376,6 +388,10 @@ class Gatherer(Entity):
                 food for food in foodlist if food._foodtype == foodtype
             ]
             return filteredlist
+
+    # self.visiblefoodssortedlist = 
+
+
 
     def visiblefoods(self,foodtype=None):
         return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsvisible,foodtype)),'Food')
