@@ -112,14 +112,14 @@ def assignRandomCollect_aggresivetry(self):
     if (f1 is not None):
         fd = self.getdistance(f1)
         gd = self.getdistance(gat1)
-        if (gd * distratio < fd) and (gat1.state != State.beaten) and (
-                self.foodcarried(gat1)):
+        if (gd * distratio < fd) and (self.checkstate(gat1) != State.beaten
+                                      ) and (self.foodcarried(gat1)):
             self.assignTask(Task.attackmove, gat1)
         elif len(self.knownfoods()) > 0:
             self.assignTask(Task.collect, self.closestfood())
         else:
             self.assignTask(Task.wander)
-    elif (gat1.state != State.beaten) and (self.foodcarried(gat1)):
+    elif (self.checkstate(gat1) != State.beaten) and (self.foodcarried(gat1)):
         self.assignTask(Task.attackmove, gat1)
     else:
         self.assignTask(Task.wander)
@@ -128,25 +128,41 @@ def assignRandomCollect_aggresivetry(self):
 
 
 myEra = Era()
+myEra.startingfoodcount = 0
 # myEra.foodrespawntickperiod = 45
 
-# myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))
-# myEra.addGatherer(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
+name = 'eve'
+myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
 
-myEra.addGatherer(Gatherer(name='cain', startingpos=myEra.getRandomPos()))
-myEra.addGatherer(Gatherer(name='abel', startingpos=myEra.getRandomPos()))
+name = 'adam'
+myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+
+name = 'cain'
+myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+
+name = 'abel'
+myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
+
+myEra.begin()
 
 # myEra.addFood(Food(startingpos=[200, 300]))
 # myEra.addFood(Food(startingpos=[250, 350]))
 # myEra.addFood(Food(startingpos=[280, 380]))
 # myEra.addFood(Food(startingpos=[350, 380]))
 
-
-# myEra.assign2Gatherer('adam', assignRandomCollect_aggresive4)
-# myEra.assign2Gatherer('eve', assignRandomCollect_aggresive4)
-myEra.assign2Gatherer('cain', assignRandomCollect_aggresivetry)
-myEra.assign2Gatherer('abel', assignRandomCollect_aggresivetry)
+# # myEra.assign2Gatherer('adam', assignRandomCollect_aggresive4)
+# myEra.assign2Gatherer('eve', assignRandomCollect_aggresivetry)
+# myEra.assign2Gatherer('cain', assignRandomCollect_aggresivetry)
+# myEra.assign2Gatherer('abel', assignRandomCollect_aggresivetry)
 
 #%%
-with PyCallGraph(output=GraphvizOutput()):
-    myEra.begin()
+# with PyCallGraph(output=GraphvizOutput()):
+# myEra.begin()
+
+#
+
+# myEra.addGatherer(Gatherer(name='adam', startingpos=myEra.getRandomPos()))

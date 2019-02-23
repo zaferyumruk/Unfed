@@ -25,7 +25,7 @@ from gatherer import Gatherer
 checkStrConvert('13',int)
 #%%
 dummy = Gatherer()
-dummy.fatigue
+dummy._fatigue
 #%%
 a = None
 
@@ -170,15 +170,15 @@ gGatherer.append(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
 
 g1 = Gatherer(name='adam', startingpos=myEra.getRandomPos())
 
-g1.foodsvisible = gFood
-g1.gatherersknown = gGatherer
+g1._foodsvisible = gFood
+g1._gatherersknown = gGatherer
 
 
 #%%
-g1.foodsvisible()
+g1._foodsvisible()
 #%%
 
-g1.getdistance(g1.foodsvisible[0])
+g1.getdistance(g1._foodsvisible[0])
 
 
 #%%

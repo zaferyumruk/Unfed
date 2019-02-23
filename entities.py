@@ -42,41 +42,41 @@ class Foodtype(Enum):
 class Entity():
     _uniqueID = 0
     def __init__(self, startingpos):
-        self.position = startingpos
-        self.active = True
+        self._position = startingpos
+        self._active = True
         Entity._uniqueID = Entity._uniqueID + 1
-        self.uniqueID = Entity._uniqueID
+        self._uniqueID = Entity._uniqueID
 
 
 class Food(Entity):
     def __init__(self, startingpos=[0.0, 0.0], foodtype=None):
         super().__init__(startingpos)
-        self.assignfoodtype(foodtype)
-        self.assignfoodatts()
-        self.knownby = []
+        self._assignfoodtype(foodtype)
+        self._assignfoodatts()
+        self._knownby = []
 
-    def assignfoodtype(self, foodtype):
+    def _assignfoodtype(self, foodtype):
         if foodtype is None:
             idx = np.random.choice(
                 np.arange(0, len(list(Foodtype))), p=Rules.foodspawnchance)
-            self.foodtype = list(Foodtype)[idx]
+            self._foodtype = list(Foodtype)[idx]
         else:
-            self.foodtype = foodtype
+            self._foodtype = foodtype
 
-    def assignfoodatts(self):
-        if self.foodtype == Foodtype.berry:
-            self.amount = 7
-            self.boost = []
-        elif self.foodtype == Foodtype.apple:
-            self.amount = 12
-            self.boost = []
-        elif self.foodtype == Foodtype.pineapple:
-            self.amount = 10
+    def _assignfoodatts(self):
+        if self._foodtype == Foodtype.berry:
+            self._amount = 7
+            self._boost = []
+        elif self._foodtype == Foodtype.apple:
+            self._amount = 12
+            self._boost = []
+        elif self._foodtype == Foodtype.pineapple:
+            self._amount = 10
             idx = np.random.choice(np.arange(0, len(list(Boost))))
-            self.boost = []
+            self._boost = []
         else:
-            self.boost = []
-            self.amount = 0
+            self._boost = []
+            self._amount = 0
 
 
 class Gatherer(Entity):
@@ -88,22 +88,22 @@ class Gatherer(Entity):
         super().__init__(startingpos)
 
         #attributes
-        self.name = name
-        self.currenttask = None
-        self.taskvariables = []
-        self.score = 0
-        self.backpack = 5
-        self.visionRange = Rules.visionrange
-        self.foodsvisible = []
-        self.foodsknown = []
-        self.gatherersknown = []
+        self._name = name
+        self._currenttask = None
+        self._taskvariables = []
+        self._score = 0
+        self._backpack = Rules.startingbackpack
+        self._visionRange = Rules.visionrange
+        self._foodsvisible = []
+        self._foodsknown = []
+        self._gatherersknown = []
         #variables
         self._assigndirection(direction)
-        self.speed = Rules.basespeed
-        self.fatigue = fatigue
-        self.state = State.idle
-        self.boosts = []
-        self.modifier = {
+        self._speed = Rules.basespeed
+        self._fatigue = fatigue
+        self._state = State.idle
+        self._boosts = []
+        self._modifier = {
             'fatiguedrain': 1.0,
             'speed': 1.0,
             'eatspeed': 1.0,
@@ -111,11 +111,11 @@ class Gatherer(Entity):
             'stunnedtime': 1.0,
             'attackcd':1.0
         }
-        self.stunnedleft = 0 # counter
-        self.attackcd = 0  # counter
-        self.foodsknowncount = 0 #debug info
+        self._stunnedleft = 0 # counter
+        self._attackcd = 0  # counter
+        self._foodsknowncount = 0 #debug info
 
-        self.task2func = {
+        self._task2func = {
             None: lambda: None,
             Task.follow: self._taskfollow,
             Task.attackmove: self._taskattackmove,
@@ -125,7 +125,7 @@ class Gatherer(Entity):
             Task.collect: self._taskcollect
         }
 
-    def update(self):
+    def _update(self):
         self._updateStunnedCd()
         self._updateAttackCd()
         self._consumeFood()
@@ -135,41 +135,41 @@ class Gatherer(Entity):
             self._executeActiveTask()
 
     def _checkReadytoExecute(self):
-        return (not self.state == State.beaten) and (not self.state == State.exhausted)
+        return (not self._state == State.beaten) and (not self._state == State.exhausted)
 
     def _checkFatigue(self):
-        if self.fatigue == 0.0:
-            self.state = State.exhausted
+        if self._fatigue == 0.0:
+            self._state = State.exhausted
 
     def _deduce(self,value):
         value, _, state = self._reduceLimited(value, 1)
         return value,state
 
     def _updateStunnedCd(self):
-        [self.stunnedleft,state] = self._deduce(self.stunnedleft)
+        [self._stunnedleft,state] = self._deduce(self._stunnedleft)
         if state == ContainerState.empty:
-            self.state = State.idle
+            self._state = State.idle
 
     def _updateAttackCd(self):
-        [self.attackcd, _ ] = self._deduce(self.attackcd)
+        [self._attackcd, _ ] = self._deduce(self._attackcd)
 
     # * TASKS
     def _executeActiveTask(self):
-        self.task2func[self.currenttask]()
+        self._task2func[self._currenttask]()
 
     def _taskfollow(self, target=None):
-        self.state = State.following
+        self._state = State.following
         if target is None:
-            target = self.taskvariables[0]
+            target = self._taskvariables[0]
         [distance,direction] = self._evalPosition(target)
         if distance > Rules.overlapdistance:
             self._assigndirection(direction)
             self._step()
 
     def _taskescape(self, target=None):
-        self.state = State.fleeing
+        self._state = State.fleeing
         if target is None:
-            target = self.taskvariables[0]
+            target = self._taskvariables[0]
         if target.active:
             [distance,direction] = self._evalPosition(target)
             self._assigndirection([-direc for direc in direction])
@@ -178,93 +178,93 @@ class Gatherer(Entity):
             self._taskcancel()
 
     def _taskattackmove(self):
-        self.state = State.charging
-        target = self.taskvariables[0]
+        self._state = State.charging
+        target = self._taskvariables[0]
         self._taskfollow(target)
         bashed = self._bash(target)
         if bashed:
             self._taskcancel()
 
     def _taskcancel(self):
-        self.state = State.idle
-        self.currenttask = None
-        self.taskvariables = []
+        self._state = State.idle
+        self._currenttask = None
+        self._taskvariables = []
 
     def _taskwander(self):
-        self.state = State.moving
+        self._state = State.moving
         update_roll = np.random.randint(0, int(1.0 / Rules.chance2changedir))
         if not update_roll:
             self._assigndirection(list(np.random.rand(2) - 0.5))
         self._step()
 
     def _taskcollect(self):
-        self.state = State.moving
-        food = self.taskvariables[0]
-        if food in self.foodsvisible:
-            if not food.active:
+        self._state = State.moving
+        food = self._taskvariables[0]
+        if food in self._foodsvisible:
+            if not food._active:
                 self._taskcancel()
-                self.foodsvisible.remove(food)
+                self._foodsvisible.remove(food)
                 self._forgetFood(food)
                 return
         self._taskfollow(food)
         collected = self._collectFood(food)
         if collected:
-            self._forgetFood(food)
             self._taskcancel()
 
-    def informedfoodsvisible(self,foodlist):
-        self.foodsvisible = foodlist
+    def _informedfoodsvisible(self,foodlist):
+        self._foodsvisible = foodlist
         for food in foodlist:
-            foodknown = food in self.foodsknown
-            if not food.active:
-                self.foodsvisible.remove(food)
+            foodknown = food in self._foodsknown
+            if not food._active:
+                self._foodsvisible.remove(food)
                 if foodknown:
                     self._forgetFood(food)
             elif not foodknown:
                 self._noticeFood(food)
-        self.foodsknowncount = len(self.foodsknown)
+        self._foodsknowncount = len(self._foodsknown)
 
     def _forgetFood(self, food):
-        self.foodsknown.remove(food)
-        food.knownby.remove(self)
-        self.foodsknowncount = len(self.foodsknown)
+        self._foodsknown.remove(food)
+        food._knownby.remove(self)
+        self._foodsknowncount = len(self._foodsknown)
 
     def _noticeFood(self, food):
-        self.foodsknown.append(food)
-        food.knownby.append(self)
-        self.foodsknowncount = len(self.foodsknown)
+        self._foodsknown.append(food)
+        food._knownby.append(self)
+        self._foodsknowncount = len(self._foodsknown)
 
     def assignTask(self,task,args=None):
-        self.currenttask = task
+        self._currenttask = task
         if args is not list:
             args = [args]
-        self.taskvariables = args
+        self._taskvariables = args
 
 
     # * BASIC ACTIONS
     def _collectFood(self,food):
         success = False
         if  self._checkReach(food):
-            success = self._addFood(food.amount)
+            success = self._storeFood(food._amount)
             if success:
-                food.active = False
-            self.state = State.idle
+                food._active = False
+                self._forgetFood(food)
         return success
 
     def _bash(self,other):
         success = False
-        if  self._checkReach(other) and self.attackcd <= 0.0:
+        if  self._checkReach(other) and self._attackcd <= 0.0:
             _ = self._reducefatigue(Rules.Fatiguedrain.attack)
             _ = other._reducefatigue(Rules.Fatiguedrain.beaten)
 
-            other.state = State.beaten
-            self.state = State.idle
+            other._state = State.beaten
+            self._state = State.idle
 
-            self.attackcd = Rules.attackcd * self.modifier['attackcd']
-            other.stunnedleft = Rules.bashstunspan * self.modifier['stuntime'] * other.modifier['stunnedtime']
+            self._attackcd = Rules.attackcd * self._modifier['attackcd']
+            other._stunnedleft = Rules.bashstunspan * self._modifier[
+                'stuntime'] * other._modifier['stunnedtime']
 
-            other.backpack = 0.0
-            self._addFood(other.backpack)
+            self._storeFood(other._backpack)
+            other._backpack = 0.0
 
             success = True
         return success
@@ -275,12 +275,12 @@ class Gatherer(Entity):
 
     # * UPDATES
     def _consumeFood(self):
-        tobeconsumed = Rules.eatspeed * self.modifier['eatspeed']
-        [self.backpack, ratioeaten, _] = self._reduceLimited(self.backpack, tobeconsumed)
-        self.score = self.score + tobeconsumed * ratioeaten * Rules.scoremultiplier
+        tobeconsumed = Rules.eatspeed * self._modifier['eatspeed']
+        [self._backpack, ratioeaten, _] = self._reduceLimited(self._backpack, tobeconsumed)
+        self._score = self._score + tobeconsumed * ratioeaten * Rules.scoremultiplier
 
     def _reflectBoostEffects(self):
-        self.speed = Rules.basespeed * self.modifier['speed']
+        self._speed = Rules.basespeed * self._modifier['speed']
 
     # reveal foods within a vicinity, at no cost
     # ! Please call after collect food or maybe after everything else
@@ -289,37 +289,37 @@ class Gatherer(Entity):
 
     # * USEFUL BASIC FUNCTIONS
     def _reducefatigue(self, fatigueloss):
-        [self.fatigue, ratioextracted, state] = self._reduceLimited(
-            self.fatigue, fatigueloss)
+        [self._fatigue, ratioextracted, state] = self._reduceLimited(
+            self._fatigue, fatigueloss)
         if state == ContainerState.empty:
-            self.state = State.exhausted
+            self._state = State.exhausted
         return ratioextracted
 
-    def _addFood(self, foodamount):
+    def _storeFood(self, foodamount):
         success = False
-        if self.backpack < Rules.backpackcap:
+        if self._backpack < Rules.backpackcap:
             success = True
-            if (self.backpack + foodamount) > Rules.backpackcap:
-                self.backpack = Rules.backpackcap
+            if (self._backpack + foodamount) > Rules.backpackcap:
+                self._backpack = Rules.backpackcap
             else:
-                self.backpack = self.backpack + foodamount
+                self._backpack = self._backpack + foodamount
         return success
 
     # ! direction manipulation at boundaries are problematic
     def _step(self):
         '''uses speed and current direction'''
-        fatigueloss = self.speed * Rules.Fatiguedrain.move * self.modifier['fatiguedrain']
-        if self.state != State.exhausted or self.state != State.beaten:
+        fatigueloss = self._speed * Rules.Fatiguedrain.move * self._modifier['fatiguedrain']
+        if self._state != State.exhausted or self._state != State.beaten:
             remains = self._reducefatigue(fatigueloss)
-            for idx in range(len(self.position)):
-                stepsize = self.direction[idx] * self.speed * remains
-                temp_pos = self.position[idx] + stepsize
+            for idx in range(len(self._position)):
+                stepsize = self._direction[idx] * self._speed * remains
+                temp_pos = self._position[idx] + stepsize
                 if not self._checkBoundary(temp_pos, Rules.Map.bounds[idx]):
-                    self.direction[idx] = -self.direction[idx]
-                    stepsize = self.direction[idx] * self.speed * remains
-                    temp_pos = self.position[idx] + stepsize
-                self._assigndirection(self.direction)
-                self.position[idx] = temp_pos
+                    self._direction[idx] = -self._direction[idx]
+                    stepsize = self._direction[idx] * self._speed * remains
+                    temp_pos = self._position[idx] + stepsize
+                self._assigndirection(self._direction)
+                self._position[idx] = temp_pos
 
     def _reduceLimited(self, holdervariable, tobeextracted):
         '''holdervariable, ratioextracted, state = self.reduceLimited(holdervariable, tobeextracted)'''
@@ -343,14 +343,14 @@ class Gatherer(Entity):
         '''(distance,direction) = evalPosition(self,arg)
         arg: coords (as list) or entity'''
         if type(arg) is list:
-            direction = np.subtract(arg, self.position)
+            direction = np.subtract(arg, self._position)
         else:
-            direction = np.subtract(arg.position, self.position)
+            direction = np.subtract(arg._position, self._position)
         distance = np.linalg.norm(direction)
         return (distance,direction)
 
     def _assigndirection(self, direction):
-        self.direction = unitvec(direction)
+        self._direction = unitvec(direction)
 
     def _checkBoundary(self,pos,bounds):
         if pos>bounds[1] or pos<bounds[0]:
@@ -358,38 +358,38 @@ class Gatherer(Entity):
         return True
 
     def getdistance(self,entity):
-        direction = np.subtract(entity.position,self.position)
+        direction = np.subtract(entity._position,self._position)
         distance = np.linalg.norm(direction)
         return distance
 
     def closestgatherer(self):
-        return self.closestentity(self.gatherersknown)
+        return self.closestentity(self._gatherersknown)
 
     def closestfood(self,foodtype=None):
-        return self.closestentity(self._listfoods(self.foodsknown,foodtype))
+        return self.closestentity(self._listfoods(self._foodsknown,foodtype))
 
     def _listfoods(self, foodlist, foodtype=None):
         if foodtype is None:
             return foodlist
         else:
             filteredlist = [
-                food for food in foodlist if food.foodtype == foodtype
+                food for food in foodlist if food._foodtype == foodtype
             ]
             return filteredlist
 
     def visiblefoods(self,foodtype=None):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self.foodsvisible,foodtype)),'Food')
+        return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsvisible,foodtype)),'Food')
 
     def knownfoods(self,foodtype=None):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self.foodsknown, foodtype)),'Food')
+        return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsknown, foodtype)),'Food')
 
     def knowngatherers(self):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self.gatherersknown),'Gatherer')
+        return self._sortedlist2dictlist(self._sortwrtdistance(self._gatherersknown),'Gatherer')
 
     def _sortwrtdistance(self,flist):
         if len(flist)>0:
             flist = flist
-            dlist = np.sqrt(self.entitydistance_2(flist))
+            dlist = np.sqrt(self._entitydistance_2(flist))
             df = sorted(zip(flist,dlist),key = lambda t: t[1])
             return df
         else:
@@ -399,7 +399,7 @@ class Gatherer(Entity):
         return [{firstkey: tup[0], 'distance': tup[1]} for tup in flist]
 
     def foodcarried(self,gatherer):
-        ratiofull = gatherer.backpack / Rules.backpackcap
+        ratiofull = gatherer._backpack / Rules.backpackcap
         if ratiofull<=0.25:
             return 0
         elif ratiofull<=0.5:
@@ -410,20 +410,20 @@ class Gatherer(Entity):
             return 3
 
     # def checkbackpack(self):
-    #     return self.backpack
+    #     return self._backpack
 
     def checkstate(self,gatherer):
-        return gatherer.state
+        return gatherer._state
 
     def closestentity(self,entitylist):
         if len(entitylist)>0:
-            return entitylist[np.argmin(self.entitydistance_2(entitylist))]
+            return entitylist[np.argmin(self._entitydistance_2(entitylist))]
         else:
             return None
 
-    def entitydistance_2(self,entitylist):
-        entitypos = [entity.position for entity in entitylist]
+    def _entitydistance_2(self,entitylist):
+        entitypos = [entity._position for entity in entitylist]
         nodes = np.asarray(entitypos)
-        node = self.position
+        node = self._position
         dist_2 = np.sum((nodes - node)**2, axis=1)
         return dist_2

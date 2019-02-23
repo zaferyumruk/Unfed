@@ -28,7 +28,7 @@ class Era():
         self.gathererlist = []
         self.foodlist = []
 
-        self.entityIDdict = {}
+        self._entityIDdict = {}
 
         self.createEntities()
 
@@ -39,28 +39,28 @@ class Era():
 
     def addFood(self, food):
         self.foodlist.append(food)
-        self.entityIDdict[food.uniqueID] = food
+        self._entityIDdict[food._uniqueID] = food
 
     def addGatherer(self, gatherer):
         self.gathererlist.append(gatherer)
-        self.entityIDdict[gatherer.uniqueID] = gatherer
+        self._entityIDdict[gatherer._uniqueID] = gatherer
 
     # ! Implement
     def removeFood(self, idx):
-        self.entityIDdict.pop(self.foodlist[idx].uniqueID)
+        self._entityIDdict.pop(self.foodlist[idx]._uniqueID)
         self.foodlist.pop(idx)
 
     # # ! Implement
     # def removeGatherer(self, gatherer):
     #     self.gathererlist.append(gatherer)
-    #     self.gathererIddict = {gatherer.uniqueID:gatherer}
+    #     self.gathererIddict = {gatherer._uniqueID:gatherer}
 
 
     def id2entity(self,id):
-        return self.entityIDdict[id]
+        return self._entityIDdict[id]
 
     def entity2id(self,entity):
-        return entity.uniqueID
+        return entity._uniqueID
 
     def grant2Gatherer(self,gatherer):
         self.informfoodsvisible(gatherer)
@@ -68,22 +68,22 @@ class Era():
     def informfoodsvisible(self,gatherer):
         newlist = []
         for food in self.foodlist:
-            if checkInRange(gatherer.visionRange,gatherer.position,food.position):
+            if checkInRange(gatherer._visionRange,gatherer._position,food._position):
                 newlist.append(food)
-        gatherer.informedfoodsvisible(newlist)
+        gatherer._informedfoodsvisible(newlist)
 
 
     def informgatherersknown(self, gatherer):
-        gatherer.gatherersknown = []
+        gatherer._gatherersknown = []
         for gat in self.gathererlist:
             if gat!=gatherer:
-                gatherer.gatherersknown.append(gat)
+                gatherer._gatherersknown.append(gat)
 
     def advanceGatherer(self,gatherer):
         func = self.gathererupdatedict[gatherer]
         if func is not None:
             func(gatherer)
-        gatherer.update()
+        gatherer._update()
 
     def begin(self):
         # step = 0
@@ -134,9 +134,9 @@ class Era():
         if type(gatherer) is str:
             check = gatherer
         else:
-            check = gatherer.name
+            check = gatherer._name
         for activegatherer in self.gathererlist:
-            if activegatherer.name == check:
+            if activegatherer._name == check:
                 self.gathererupdatedict[activegatherer] = func
 
     def updateEntitites(self):
@@ -146,7 +146,7 @@ class Era():
             self.grant2Gatherer(gatherer)
             self.advanceGatherer(gatherer)
         for idx, food in enumerate(self.foodlist):
-            if not food.active and len(food.knownby)==0:
+            if not food._active and len(food._knownby)==0:
                 self.removeFood(idx)
 
     def updateSurface(self):

@@ -51,17 +51,17 @@ class Surface():
         pygame.display.update()
 
     def updateFoodOnBoard(self, food, count):
-        count = food.uniqueID
+        count = food._uniqueID
         unitsize = 2
-        if food.active:
-            size = food.amount * unitsize + len(food.boost) * unitsize*2
+        if food._active:
+            size = food._amount * unitsize + len(food._boost) * unitsize*2
         else:
             size = unitsize
         color1 = self.colors[(count) % len(self.colors)]
-        intpos = [int(pos) for pos in food.position]
-        nametext = self.labelfont.render(food.foodtype.name, False,
+        intpos = [int(pos) for pos in food._position]
+        nametext = self.labelfont.render(food._foodtype.name, False,
                                     Colors.black)
-        if food.active:
+        if food._active:
             pygame.gfxdraw.box(
                 self.gameDisplay,
                 [intpos[0] - size / 2, intpos[1] - size / 2, size, size],
@@ -77,17 +77,17 @@ class Surface():
     def updateGathererOnBoard(self,gatherer, count):
         color1 = self.colors[(count) % len(self.colors)]
         color2 = self.colors[(count + 1) % len(self.colors)]
-        intpos = [int(pos) for pos in gatherer.position]
+        intpos = [int(pos) for pos in gatherer._position]
         dirlenscale = 15
         dirtippos = [
-            int(pos + gatherer.direction[idx] * dirlenscale)
-            for idx, pos in enumerate(gatherer.position)
+            int(pos + gatherer._direction[idx] * dirlenscale)
+            for idx, pos in enumerate(gatherer._position)
         ]
 
         statustext = self.labelfont.render(
-            str(gatherer.state), False, Colors.black)
+            str(gatherer._state), False, Colors.black)
         namelabel = self.labelfont.render(
-            str(gatherer.name), False, Colors.black)
+            str(gatherer._name), False, Colors.black)
 
         # fatigueinfoBar(self, gatherer, count)
 
@@ -98,12 +98,12 @@ class Surface():
         pygame.gfxdraw.line(self.gameDisplay, intpos[0], intpos[1],
                             dirtippos[0], dirtippos[1], color2)
         pygame.gfxdraw.circle(self.gameDisplay, intpos[0], intpos[1],
-                              gatherer.visionRange, color2)
+                              gatherer._visionRange, color2)
         self.gameDisplay.blit(statustext,
-                                (gatherer.position[0], gatherer.position[1]))
+                                (gatherer._position[0], gatherer._position[1]))
         self.gameDisplay.blit(
-            namelabel, (gatherer.position[0],
-                        gatherer.position[1] - statustext.get_height()))
+            namelabel, (gatherer._position[0],
+                        gatherer._position[1] - statustext.get_height()))
 
     def custominfoHUD(self, text):
         customtext = self.labelfont.render(text, False, Colors.black)
@@ -111,8 +111,8 @@ class Surface():
 
     def fatigueinfoBar(self,gatherer,count):
 
-        nametext = self.HUDfont.render(gatherer.name, False, Colors.black)
-        datatext = self.HUDfont.render(str(gatherer.fatigue), False, Colors.black)
+        nametext = self.HUDfont.render(gatherer._name, False, Colors.black)
+        datatext = self.HUDfont.render(str(gatherer._fatigue), False, Colors.black)
 
         h = 25
         ybase = count * (h + 5)
@@ -121,16 +121,16 @@ class Surface():
         self.gameDisplay.blit(datatext, (200, ybase))
         pygame.draw.rect(self.gameDisplay, Colors.black,
                             [60, ybase, 100, 25], 1)
-        barvalue = int(gatherer.fatigue)
-        # barvalue = int(gatherer.backpack * 20)
+        barvalue = int(gatherer._fatigue)
+        # barvalue = int(gatherer._backpack * 20)
         if barvalue != 0:
             pygame.draw.rect(self.gameDisplay, Colors.red,
                                 [60, ybase, barvalue, 25], 0)
 
     def infoHUD(self, dude=None, count=0):
         watchedattrs = [
-            'foodsknowncount','fatigue', 'state', 'backpack', 'stunnedleft', 'attackcd',
-            'score', 'currenttask'
+            '_foodsknowncount', '_fatigue', '_state', '_backpack',
+            '_stunnedleft', '_attackcd', '_score', '_currenttask'
         ]
         hy = 15
         hx = 120
@@ -152,7 +152,7 @@ class Surface():
                 self.gameDisplay.blit(datatext, (xstart, ystart))
                 ystart = ystart - hy
             datatext = self.infofont.render(
-                str(dude.name), False, Colors.black)
+                str(dude._name), False, Colors.black)
             self.gameDisplay.blit(datatext, (xstart, ystart))
         else:
             for attrname in watchedattrs:

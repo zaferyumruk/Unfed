@@ -6,10 +6,11 @@ class Rules():
     startingfatigue = 6000.0  #value
     eatspeed = 1.0 / tickrate  #rate
     foodspawnchance = maxnorm([50, 40, 5])  #value
-    bashstunspan = 8.0 * tickrate  #timespan
+    bashstunspan = 5.0 * tickrate  #timespan
     scoremultiplier = 10  #value
-    attackcd = 3.0 * tickrate  #timespan
+    attackcd = 8.0 * tickrate  #timespan
     backpackcap = 60.0  #value
+    startingbackpack = 0
     reachdistance = 20.0
     overlapdistance = 5.0
     chance2changedir = 0.005  # utilized in taskwander
