@@ -97,7 +97,7 @@ class Gatherer(Entity):
         self._visionRange = Rules.visionrange
         self._foodsvisible = []
         self._foodsknown = []
-        self._gatherersknown = []
+        self._gatherersvisible = []
         #variables
         self._assigndirection(direction)
         self._speed = Rules.basespeed
@@ -131,7 +131,6 @@ class Gatherer(Entity):
         self._updateAttackCd()
         self._consumeFood()
         self._checkFatigue()
-        self._updateVision()
         if self._checkReadytoExecute():
             self._executeActiveTask()
 
@@ -318,7 +317,7 @@ class Gatherer(Entity):
 
     # ! gatherersknown should be replaced with gatherersvisible when needed
     def isvisible(self,entity):
-        return (entity in self._foodsvisible or entity in self._gatherersknown)
+        return (entity in self._foodsvisible or entity in self._gatherersvisible)
 
     def _step(self):
         '''uses speed and current direction'''
@@ -377,10 +376,10 @@ class Gatherer(Entity):
         return distance
 
     def closestgatherer(self):
-        return self.closestentity(self._gatherersknown)
+        return self._closestentity(self._gatherersvisible)
 
     def closestfood(self,foodtype=None):
-        return self.closestentity(self._listfoods(self._foodsknown,foodtype))
+        return self._closestentity(self._listfoods(self._foodsknown,foodtype))
 
     def _listfoods(self, foodlist, foodtype=None):
         if foodtype is None:
@@ -397,8 +396,8 @@ class Gatherer(Entity):
     def knownfoods(self,foodtype=None):
         return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsknown, foodtype)),'Food')
 
-    def knowngatherers(self):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self._gatherersknown),'Gatherer')
+    def visiblegatherers(self):
+        return self._sortedlist2dictlist(self._sortwrtdistance(self._gatherersvisible),'Gatherer')
 
     def _sortwrtdistance(self,flist):
         if len(flist)>0:
@@ -429,7 +428,7 @@ class Gatherer(Entity):
     def checkstate(self,gatherer):
         return gatherer._state
 
-    def closestentity(self,entitylist):
+    def _closestentity(self,entitylist):
         if len(entitylist)>0:
             return entitylist[np.argmin(self._entitydistance_2(entitylist))]
         else:
@@ -441,3 +440,4 @@ class Gatherer(Entity):
         node = self._position
         dist_2 = np.sum((nodes - node)**2, axis=1)
         return dist_2
+

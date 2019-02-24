@@ -161,11 +161,11 @@ myEra.assign2Gatherer(name, trywander)
 
 name = 'adam'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trywander2)
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
 
 name = 'cain'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trywander3)
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
 
 # name = 'abel'
 # myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))

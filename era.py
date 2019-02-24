@@ -75,11 +75,11 @@ class Era():
         gatherer._informedfoodsvisible(newlist)
 
 
-    def informgatherersknown(self, gatherer):
-        gatherer._gatherersknown = []
+    def informgatherersvisible(self, gatherer):
+        gatherer._gatherersvisible = []
         for gat in self.gathererlist:
             if gat!=gatherer:
-                gatherer._gatherersknown.append(gat)
+                gatherer._gatherersvisible.append(gat)
 
     def advanceGatherer(self,gatherer):
         func = self.gathererupdatedict[gatherer]
@@ -123,7 +123,7 @@ class Era():
 
     # ! since no gatherer added later on, each informed of all others only once at the start
     def init4Gatherer(self,gatherer):
-        self.informgatherersknown(gatherer)
+        self.informgatherersvisible(gatherer)
 
     def assign2Gatherer(self, gatherer, func):
         if type(gatherer) is str:

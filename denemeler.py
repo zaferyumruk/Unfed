@@ -139,7 +139,7 @@ gFood.append(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
 g1=Gatherer(name='adam', startingpos=myEra.getRandomPos())
 
 #%%
-g1.closestentity(gFood)
+g1._closestentity(gFood)
 
 #%%
 gFood[2]
@@ -171,7 +171,7 @@ gGatherer.append(Gatherer(name='eve', startingpos=myEra.getRandomPos()))
 g1 = Gatherer(name='adam', startingpos=myEra.getRandomPos())
 
 g1._foodsvisible = gFood
-g1._gatherersknown = gGatherer
+g1._gatherersvisible = gGatherer
 
 
 #%%
@@ -198,5 +198,17 @@ a = [1,2,3]
 
 #%%
 a.remove(4)
+
+#%%
+a=[]
+
+#%%
+len(a)
+
+#%%
+a= None
+
+#%%
+len(a)
 
 #%%
