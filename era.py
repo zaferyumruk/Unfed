@@ -18,6 +18,7 @@ class Era():
         self.startingfoodcount = Rules.startingfoodcount
         self.foodrespawntickperiod = Rules.foodrespawntickperiod
         self.tickrate = Rules.tickrate
+        self.spawnedfoodcap = Rules.spawnedfoodcap
         # self.logictickperiod = int(Rules.logictickrate / Rules.tickrate)
 
         self.gathererupdatedict = defaultdict(lambda:None)
@@ -25,14 +26,15 @@ class Era():
         self.running = True
         self.updating = False
 
+        self.foodrespawncountdown = self.foodrespawntickperiod
+        self.foodgrowing = True
+
         self.gathererlist = []
         self.foodlist = []
 
         self._entityIDdict = {}
 
-        self.createEntities()
-
-    def createEntities(self):
+    def createFoods(self):
         for _ in range(self.startingfoodcount):
             self.addFood(Food(startingpos=self.getRandomPos()))
         pass
@@ -86,9 +88,6 @@ class Era():
         gatherer._update()
 
     def begin(self):
-        # step = 0
-        foodrespawncountdown = self.foodrespawntickperiod
-        foodgrowing = True
         self.initEntities()
         while self.running:
             # step = step + 1
@@ -102,31 +101,27 @@ class Era():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.dict['button'] == 1:
                         self.addFood(Food(startingpos=event.dict['pos']))
-                        
+
                     if event.dict['button'] == 3:
-                        if foodgrowing:
-                            foodgrowing = False
+                        if self.foodgrowing:
+                            self.foodgrowing = False
                         else:
-                            foodgrowing = True
+                            self.foodgrowing = True
 
             if self.updating:
-                foodrespawncountdown = foodrespawncountdown - 1
-                if foodrespawncountdown == 0:
-                    foodrespawncountdown = self.foodrespawntickperiod
-                    if foodgrowing:
-                        self.addFood(Food(startingpos=self.getRandomPos()))
-                # if step >= self.logictickperiod:
-                #     self.updateEntitites()
-                #     step = 0
+
+                self.spawnfood()
                 self.updateEntitites()
                 self.updateSurface()
 
             self.clock.tick(self.tickrate)
 
     def initEntities(self):
+        self.createFoods()
         for gatherer in self.gathererlist:
             self.init4Gatherer(gatherer)
 
+    # ! since no gatherer added later on, each informed of all others only once at the start
     def init4Gatherer(self,gatherer):
         self.informgatherersknown(gatherer)
 
@@ -139,6 +134,14 @@ class Era():
             if activegatherer._name == check:
                 self.gathererupdatedict[activegatherer] = func
 
+    def spawnfood(self):
+        self.foodrespawncountdown -= 1
+        if self.foodrespawncountdown == 0:
+            self.foodrespawncountdown = self.foodrespawntickperiod
+            if len(self.foodlist) < self.spawnedfoodcap and self.foodgrowing:
+                self.addFood(Food(startingpos=self.getRandomPos()))
+
+
     def updateEntitites(self):
         randomgathererlist = self.gathererlist.copy()
         random.shuffle(randomgathererlist)
@@ -150,10 +153,26 @@ class Era():
                 self.removeFood(idx)
 
     def updateSurface(self):
-        self.surface.update(self.gathererlist,self.foodlist)
+        self.surface.update(self.gathererlist,self.foodlist,self.checkgameover())
 
     def getRandomPos(self):
         return [
             np.random.randint(0, self.surface.windowsize[0]),
             np.random.randint(0, self.surface.windowsize[1])
         ]
+
+    def checkgameover(self):
+        over = True
+        allfoodconsumed = True
+        for gatherer in self.gathererlist:
+            if gatherer._state != State.exhausted:
+                over = False
+            if gatherer._backpack > 0.0:
+                allfoodconsumed = False
+        if over :
+            if allfoodconsumed:
+                return True
+            else:
+                for gatherer in self.gathererlist:
+                    gatherer._modifier['eatspeed'] = 1000
+                    gatherer._scoremultiplier = Rules.scoremultiplier2

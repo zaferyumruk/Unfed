@@ -3,22 +3,24 @@ from common import maxnorm
 class Rules():
     tickrate = 60
     basespeed = 75.0 / tickrate  #rate, pixels
-    startingfatigue = 6000.0  #value
+    startingfatigue = 5000.0  #value
     eatspeed = 1.0 / tickrate  #rate
     foodspawnchance = maxnorm([50, 40, 5])  #value
     bashstunspan = 5.0 * tickrate  #timespan
-    scoremultiplier = 10  #value
+    scoremultiplier1 = 10  #value during game per food consumed
+    scoremultiplier2 = 2  #value when game over per food left
     attackcd = 8.0 * tickrate  #timespan
     backpackcap = 60.0  #value
     startingbackpack = 0
     reachdistance = 20.0
     overlapdistance = 5.0
-    chance2changedir = 0.005  # utilized in taskwander
+    apprxdirchanges = 3  # utilized in taskwander approximate number of direction changes per 10 secs
+    apprxdirchanges_unittime = 10 # seconds
     visionrange = 100
-    foodrespawntickperiod = 60
-    startingfoodcount = 20
-    spawnedfoodcap = 5
-    
+    foodrespawntickperiod = 10
+    startingfoodcount = 18
+    spawnedfoodcap = 20
+
 
     class Fatiguedrain():
         move = 0.1  # per pixel

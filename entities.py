@@ -92,6 +92,7 @@ class Gatherer(Entity):
         self._currenttask = None
         self._taskvariables = []
         self._score = 0
+        self._scoremultiplier = Rules.scoremultiplier1
         self._backpack = Rules.startingbackpack
         self._visionRange = Rules.visionrange
         self._foodsvisible = []
@@ -198,7 +199,13 @@ class Gatherer(Entity):
 
     def _taskwander(self):
         self._state = State.moving
-        update_roll = np.random.randint(0, int(1.0 / Rules.chance2changedir))
+        if len(self._taskvariables) and (type(self._taskvariables[0]) is int or
+                                         type(self._taskvariables[0]) is float):
+            apprxdirchanges = self._taskvariables[0]
+        else:
+            apprxdirchanges = Rules.apprxdirchanges
+        update_roll = np.random.randint(0,int(1.0 / (apprxdirchanges / Rules.tickrate /
+                       Rules.apprxdirchanges_unittime)))
         if not update_roll:
             self._assigndirection(list(np.random.rand(2) - 0.5))
         self._step()
@@ -286,15 +293,10 @@ class Gatherer(Entity):
     def _consumeFood(self):
         tobeconsumed = Rules.eatspeed * self._modifier['eatspeed']
         [self._backpack, ratioeaten, _] = self._reduceLimited(self._backpack, tobeconsumed)
-        self._score = self._score + tobeconsumed * ratioeaten * Rules.scoremultiplier
+        self._score = self._score + tobeconsumed * ratioeaten * self._scoremultiplier
 
     def _reflectBoostEffects(self):
         self._speed = Rules.basespeed * self._modifier['speed']
-
-    # reveal foods within a vicinity, at no cost
-    # ! Please call after collect food or maybe after everything else
-    def _updateVision(self):
-        pass
 
     # * USEFUL BASIC FUNCTIONS
     def _reducefatigue(self, fatigueloss):
@@ -388,10 +390,6 @@ class Gatherer(Entity):
                 food for food in foodlist if food._foodtype == foodtype
             ]
             return filteredlist
-
-    # self.visiblefoodssortedlist = 
-
-
 
     def visiblefoods(self,foodtype=None):
         return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsvisible,foodtype)),'Food')

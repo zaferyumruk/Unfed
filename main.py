@@ -133,25 +133,43 @@ def trycollect(self):
     #     self.assignTask(Task.wander)
 
 
+def trywander(self):
+    self.assignTask(Task.wander)
+
+
+def trywander2(self):
+    self.assignTask(Task.wander,['zza'])
+
+
+# def trywander3(self):
+#     self.assignTask(Task.wander,10)
+
+
+def trywander3(self):
+    self.assignTask(Task.wander, 10)
+
+
+
 myEra = Era()
-myEra.startingfoodcount = 0
-# myEra.foodrespawntickperiod = 45
+# myEra.startingfoodcount = 0
+# myEra.spawnedfoodcap = 5
+# myEra.foodrespawntickperiod = 120
 
 name = 'eve'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trycollect)
+myEra.assign2Gatherer(name, trywander)
 
 name = 'adam'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trycollect)
+myEra.assign2Gatherer(name, trywander2)
 
 name = 'cain'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trycollect)
+myEra.assign2Gatherer(name, trywander3)
 
-name = 'abel'
-myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trycollect)
+# name = 'abel'
+# myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
+# myEra.assign2Gatherer(name, trywander)
 
 myEra.begin()
 

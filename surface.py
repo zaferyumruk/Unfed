@@ -32,8 +32,12 @@ class Surface():
         self.gameDisplay.fill(Colors.white)
         pygame.display.set_caption(caption)
 
-    def update(self,gathererlist,foodlist) :
-        self.gameDisplay.fill(Colors.white)
+    def update(self,gathererlist,foodlist,gameover) :
+        if gameover:
+            self.gameDisplay.fill(Colors.blue)
+        else:
+            self.gameDisplay.fill(Colors.white)
+            
         self.infoHUD()
         # custominfoHUD(str(adam.evalPosition(eve)))
 
