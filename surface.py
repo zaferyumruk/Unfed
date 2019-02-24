@@ -37,9 +37,10 @@ class Surface():
             self.gameDisplay.fill(Colors.blue)
         else:
             self.gameDisplay.fill(Colors.white)
-            
+
         self.infoHUD()
-        # custominfoHUD(str(adam.evalPosition(eve)))
+
+
 
         foodcount = 0
         for food in foodlist:
@@ -51,6 +52,18 @@ class Surface():
             self.updateGathererOnBoard(dude, dudecount)
             dudecount = dudecount + 1
             self.infoHUD(dude, dudecount)
+
+
+        #CUSTOM DEBUG TEXT
+        # txt1 = gathererlist[1]._name + ' facing ' + gathererlist[0]._name + 'with '
+        # self.custominfoHUD(txt1 + str(gathererlist[0].getfacing(gathererlist[1])) + ' degrees')
+
+        afood = gathererlist[1].closestgatherer()
+        if afood is not None:
+            # txt1 = afood._foodtype.name + ' staying in ' + str(gathererlist[1].getdirection(afood))
+            txt1 = afood._name + ' staying in ' + str(
+                gathererlist[1].getdirection(afood))
+            self.custominfoHUD( txt1 + 'degrees wrt ' + gathererlist[1]._name)
 
         pygame.display.update()
 

@@ -157,7 +157,7 @@ myEra = Era()
 
 name = 'eve'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))
-myEra.assign2Gatherer(name, trywander)
+myEra.assign2Gatherer(name, assignRandomCollect_aggresivetry)
 
 name = 'adam'
 myEra.addGatherer(Gatherer(name=name, startingpos=myEra.getRandomPos()))

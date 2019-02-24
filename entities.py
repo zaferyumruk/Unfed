@@ -2,7 +2,7 @@ import numpy as np
 from enum import Enum
 
 from rules import Rules
-from common import unitvec
+from common import unitvec, angle_between_vectors, angle_vector
 
 class ContainerState(Enum):
     empty = 1
@@ -98,6 +98,7 @@ class Gatherer(Entity):
         self._foodsvisible = []
         self._foodsknown = []
         self._gatherersvisible = []
+        self._relatedentitites = {}
         #variables
         self._assigndirection(direction)
         self._speed = Rules.basespeed
@@ -248,6 +249,14 @@ class Gatherer(Entity):
         food._knownby.append(self)
         self._foodsknowncount = len(self._foodsknown)
 
+    # # ! sort _foodsknown _foodsvisible _gatherersvisible
+    # def _sortentitieswrtdistance(self):
+    #     self._relatedentitites = {}
+
+
+
+    #     return None
+
     def assignTask(self,task,args=None):
         self._currenttask = task
         if args is not list:
@@ -362,6 +371,13 @@ class Gatherer(Entity):
         distance = np.linalg.norm(direction)
         return (distance,direction)
 
+    def getdirection(self,entity):
+        return (angle_vector(np.subtract(entity._position,self._position)) - 90.0)%360.0 -180.0
+
+    def getfacing(self,gatherer):
+        spatialvec = np.subtract(self._position,gatherer._position)
+        return angle_between_vectors(spatialvec, gatherer._direction)
+
     def _assigndirection(self, direction):
         self._direction = unitvec(direction)
 
@@ -370,7 +386,13 @@ class Gatherer(Entity):
             return False
         return True
 
-    def getdistance(self,entity):
+    # def getdistance(self,entity):
+    #     return self._relatedentitites[entity][0]
+
+    # def getfacing(self,entity):
+    #     return self._relatedentitites[entity][1]
+
+    def getdistance(self, entity):
         direction = np.subtract(entity._position,self._position)
         distance = np.linalg.norm(direction)
         return distance
@@ -390,26 +412,28 @@ class Gatherer(Entity):
             ]
             return filteredlist
 
+    # def sortentitieswrtdistance(self):
+
     def visiblefoods(self,foodtype=None):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsvisible,foodtype)),'Food')
+        return self._sortwrtdistance(self._listfoods(self._foodsvisible, foodtype))
 
     def knownfoods(self,foodtype=None):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self._listfoods(self._foodsknown, foodtype)),'Food')
+        return self._sortwrtdistance(self._listfoods(self._foodsknown, foodtype))
 
     def visiblegatherers(self):
-        return self._sortedlist2dictlist(self._sortwrtdistance(self._gatherersvisible),'Gatherer')
+        return self._sortwrtdistance(self._sortwrtdistance(self._gatherersvisible))
 
     def _sortwrtdistance(self,flist):
         if len(flist)>0:
             flist = flist
             dlist = np.sqrt(self._entitydistance_2(flist))
             df = sorted(zip(flist,dlist),key = lambda t: t[1])
-            return df
+            return [f for f, _ in df]
         else:
             return []
 
-    def _sortedlist2dictlist(self,flist,firstkey):
-        return [{firstkey: tup[0], 'distance': tup[1]} for tup in flist]
+    # def _sortedlist2dictlist(self,flist,firstkey):
+    #     return [{firstkey: tup[0], 'distance': tup[1]} for tup in flist]
 
     def foodcarried(self,gatherer):
         ratiofull = gatherer._backpack / Rules.backpackcap
@@ -434,10 +458,12 @@ class Gatherer(Entity):
         else:
             return None
 
+    def checkfoodtype(self,food):
+        return food._foodtype
+
     def _entitydistance_2(self,entitylist):
         entitypos = [entity._position for entity in entitylist]
         nodes = np.asarray(entitypos)
         node = self._position
         dist_2 = np.sum((nodes - node)**2, axis=1)
         return dist_2
-

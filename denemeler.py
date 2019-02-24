@@ -212,3 +212,17 @@ a= None
 len(a)
 
 #%%
+from common import angle_between
+angle_between((1, 0), (0, 1))
+
+#%%
+
+
+#%%
+angle_between((1, 0, 0), (0, 0, 0))
+
+#%%
+angle_between((1, 0), (-0.5, -0.5))*180/3.14
+
+
+#%%
