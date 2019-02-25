@@ -2,8 +2,9 @@ from common import maxnorm
 
 class Rules():
     tickrate = 60
+    windowsize = [1224, 768]
     basespeed = 75.0 / tickrate  #rate, pixels
-    startingfatigue = 5000.0  #value
+    startingfatigue = 70.0  #value
     eatspeed = 1.0 / tickrate  #rate
     foodspawnchance = maxnorm([50, 40, 5])  #value
     bashstunspan = 5.0 * tickrate  #timespan
@@ -16,10 +17,10 @@ class Rules():
     overlapdistance = 5.0
     apprxdirchanges = 3  # utilized in taskwander approximate number of direction changes per 10 secs
     apprxdirchanges_unittime = 10 # seconds
-    visionrange = 100
-    foodrespawntickperiod = 10
-    startingfoodcount = 18
-    spawnedfoodcap = 20
+    visionrange = 175
+    foodrespawntickperiod = 40
+    startingfoodcount = 28
+    spawnedfoodcap = 56
 
 
     class Fatiguedrain():
@@ -30,6 +31,6 @@ class Rules():
         lookaround = 3  #per action
 
     class Map():
-        size = [800, 600]
-        bounds = [[0, 800], [0, 600]]
-        center = [int(entry / 2) for entry in size]
+        bounds = [[0, 1024], [0, 768]]
+        center = [int((boundary[0]+boundary[1]) / 2) for boundary in bounds]
+        

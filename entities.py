@@ -2,7 +2,7 @@ import numpy as np
 from enum import Enum
 
 from rules import Rules
-from common import unitvec, angle_between_vectors, angle_vector
+from common import unitvec, angle_between_vectors, angle_vector, checkBoundarySingle
 
 class ContainerState(Enum):
     empty = 1
@@ -65,13 +65,13 @@ class Food(Entity):
 
     def _assignfoodatts(self):
         if self._foodtype == Foodtype.berry:
-            self._amount = 7
+            self._amount = 5
             self._boost = []
         elif self._foodtype == Foodtype.apple:
-            self._amount = 12
+            self._amount = 8
             self._boost = []
         elif self._foodtype == Foodtype.pineapple:
-            self._amount = 10
+            self._amount = 13
             # idx = np.random.choice(np.arange(0, len(list(Boost))))
             self._boost = []
         else:
@@ -336,7 +336,7 @@ class Gatherer(Entity):
             for idx in range(len(self._position)):
                 stepsize = self._direction[idx] * self._speed * remains
                 temp_pos = self._position[idx] + stepsize
-                if not self._checkBoundary(temp_pos, Rules.Map.bounds[idx]):
+                if not checkBoundarySingle(temp_pos, Rules.Map.bounds[idx]):
                     self._direction[idx] = -self._direction[idx]
                     stepsize = self._direction[idx] * self._speed * remains
                     temp_pos = self._position[idx] + stepsize
@@ -381,10 +381,8 @@ class Gatherer(Entity):
     def _assigndirection(self, direction):
         self._direction = unitvec(direction)
 
-    def _checkBoundary(self,pos,bounds):
-        if pos>bounds[1] or pos<bounds[0]:
-            return False
-        return True
+
+
 
     # def getdistance(self,entity):
     #     return self._relatedentitites[entity][0]
@@ -467,3 +465,4 @@ class Gatherer(Entity):
         node = self._position
         dist_2 = np.sum((nodes - node)**2, axis=1)
         return dist_2
+

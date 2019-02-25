@@ -3,18 +3,19 @@ import numpy as np
 import random
 from collections import defaultdict
 
-from surface import Surface
+from surface import GameWindow
 from entities import Gatherer, Food, Task, State
-from common import checkInRange, maxnorm
+from common import checkInRange, maxnorm, checkBoundaryList
 from rules import Rules
 
 class Era():
     def __init__(self):
 
         pygame.init()
-
-        self.surface = Surface()
-
+        
+        self.windowsize = Rules.windowsize
+        self.bounds = Rules.Map.bounds
+        self.surface = GameWindow(windowsize=self.windowsize,bounds=self.bounds)
         self.startingfoodcount = Rules.startingfoodcount
         self.foodrespawntickperiod = Rules.foodrespawntickperiod
         self.tickrate = Rules.tickrate
@@ -92,14 +93,18 @@ class Era():
         while self.running:
             # step = step + 1
             for event in pygame.event.get():
+                
                 if event.type == pygame.QUIT:
                     self.running = False
                 if event.type == pygame.KEYDOWN:
-                    self.updating = True
+                    key = event.dict['key']
+                    if key == 32 or key == 271 or key == 13:
+                        self.updating = True
                 if event.type == pygame.KEYUP:
-                    self.updating = False
+                    if event.dict['key'] == 32:
+                        self.updating = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.dict['button'] == 1:
+                    if event.dict['button'] == 1 and checkBoundaryList(event.dict['pos'],self.bounds):
                         self.addFood(Food(startingpos=event.dict['pos']))
 
                     if event.dict['button'] == 3:
@@ -153,12 +158,12 @@ class Era():
                 self.removeFood(idx)
 
     def updateSurface(self):
-        self.surface.update(self.gathererlist,self.foodlist,self.checkgameover())
+        self.surface.update(self)
 
     def getRandomPos(self):
         return [
-            np.random.randint(0, self.surface.windowsize[0]),
-            np.random.randint(0, self.surface.windowsize[1])
+            np.random.randint(self.bounds[0][0], self.bounds[0][1]),
+            np.random.randint(self.bounds[1][0], self.bounds[1][1])
         ]
 
     def checkgameover(self):

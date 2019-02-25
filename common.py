@@ -1,4 +1,5 @@
 import numpy as np
+import enum
 
 def checkInRange(r, center, pos):
     xdiff = center[0] - pos[0]
@@ -57,3 +58,15 @@ def angle_between_vectors(v1, v2):
 
 def angle_vector(v):
     return np.arctan2(v[1], v[0]) * 180 / np.pi
+
+
+def checkBoundarySingle(pos,bounds):
+    if pos>bounds[1] or pos<bounds[0]:
+        return False
+    return True
+
+def checkBoundaryList(poslist,boundslist):
+    for idx,bounds in enumerate(boundslist):
+        if not checkBoundarySingle(poslist[idx],bounds):
+            return False
+    return True
