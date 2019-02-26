@@ -8,7 +8,7 @@ def collectclosestFood(self):
     if closestfood is not None:
         self.assignTask(Task.collect, closestfood)
     else:
-        self.assignTask(Task.wander)
+        self.assignTask(Task.wander,0.1)
 
 def appleLover(self):
     closestfood = self.closestfood(Foodtype.apple)
@@ -65,7 +65,12 @@ def runfromhatefuleyes_ifcloseandnotbeaten(self):
 
 
 
-gathering = Gathering(gatherercount=7)
+gathering = Gathering(gatherercount=23)
+
+gathering.foodrespawntickperiod = 10
+gathering.tickrate = 60
+gathering.spawnedfoodcap = 200
+
 
 gathering.addGatherer('zaf')
 gathering.assign2Gatherer('zaf',appleLover)

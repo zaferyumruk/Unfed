@@ -4,10 +4,10 @@ class Rules():
     tickrate = 60
     windowsize = [1224, 800]
     basespeed = 90.0 / tickrate  #rate, pixels
-    startingfatigue = 200.0  #value
+    startingfatigue = 400.0  #value
     eatspeed = 1.0 / tickrate  #rate
     foodspawnchance = maxnorm([50, 40, 5])  #value
-    bashstunspan = 5.0 * tickrate  #timespan
+    bashstunspan = 4.0 * tickrate  #timespan
     scoremultiplier1 = 10  #value during game per food consumed
     scoremultiplier2 = 2  #value when game over per food left
     attackcd = 8.0 * tickrate  #timespan
@@ -31,6 +31,7 @@ class Rules():
         lookaround = 3  #per action
 
     class Map():
+        size = [1024,800]
         bounds = [[0, 1024], [0, 800]]
         center = [int((boundary[0]+boundary[1]) / 2) for boundary in bounds]
         

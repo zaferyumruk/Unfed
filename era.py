@@ -113,7 +113,7 @@ class Era():
                         else:
                             self.foodgrowing = True
 
-            if self.updating:
+            if not self.checkgameover() and self.updating:
 
                 self.spawnfood()
                 self.updateEntitites()

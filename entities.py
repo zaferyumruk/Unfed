@@ -268,10 +268,13 @@ class Gatherer(Entity):
     def _collectFood(self,food):
         success = False
         if  self._checkReach(food):
-            success = self._storeFood(food._amount)
-            if success:
-                food._active = False
-                self._forgetFood(food)
+            rat = self._reducefatigue(Rules.Fatiguedrain.collect)
+            if rat > 0:
+                success = self._storeFood(food._amount)
+                _ = self._reducefatigue(Rules.Fatiguedrain.collect)
+                if success:
+                    food._active = False
+                    self._forgetFood(food)
         return success
 
     def _bash(self,other):
