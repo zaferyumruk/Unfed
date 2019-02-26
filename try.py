@@ -1,4 +1,4 @@
-from sampleRun import sampleHunt
+from gathering import Gathering
 from entities import State,Task, Foodtype
 
 
@@ -65,9 +65,12 @@ def runfromhatefuleyes_ifcloseandnotbeaten(self):
 
 
 
-hunt = sampleHunt(gatherercount=7)
+gathering = Gathering(gatherercount=7)
 
-hunt.addGatherer('zaf')
-hunt.assign2Gatherer('zaf',appleLover)
+gathering.addGatherer('zaf')
+gathering.assign2Gatherer('zaf',appleLover)
 
-hunt.begin()
+gathering.begin()
+
+
+

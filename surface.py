@@ -36,13 +36,15 @@ class GameWindow():
         
         pygame.display.set_caption(caption)
 
-        top = bounds[0][0]
-        left = bounds[1][0]
-        height = bounds[0][1] - top
-        width = bounds[1][1] - left
-        self.activerect = [top,left,height,width]
 
-        # self.fog = pygame.Surface([width,height])
+        self.unitsize = 1.5
+        self.acttop = bounds[0][0]
+        self.actleft = bounds[1][0]
+        self.actheight = bounds[0][1] - self.acttop
+        self.actwidth = bounds[1][1] - self.actleft
+        self.activerect = [self.acttop,self.actleft,self.actheight,self.actwidth]
+
+        self.fog = pygame.Surface([self.actheight,self.actwidth])
         
         self.foodcolor = {Foodtype.berry: Colors.red,
             Foodtype.apple : Colors.green,
@@ -61,8 +63,9 @@ class GameWindow():
         foodlist = era.foodlist
         gameover = era.checkgameover()
 
-        pygame.gfxdraw.box(self.gameDisplay, self.activerect , Colors.gray)
-        # pygame.gfxdraw.box(self.fog, self.activerect , Colors.gray + [230])
+        pygame.gfxdraw.box(self.gameDisplay, self.activerect , [50,80,50])
+        self.fog.fill(Colors.white)
+        # pygame.gfxdraw.box(self.gameDisplay, self.activerect , Colors.red + [10])
 
         # pixels = pygame.surfarray.pixels2d(self.fog)
         # pixels ^= 2 ** 32 - 1
@@ -84,6 +87,10 @@ class GameWindow():
             # self.infoHUD(dude, dudecount)
 
         self.fatigueinfoBar(gathererlist)
+        
+        self.fog.set_alpha(30,2)
+        
+        self.gameDisplay.blit(self.fog,[self.acttop,self.actleft])
 
         #CUSTOM DEBUG TEXT
         
@@ -97,15 +104,17 @@ class GameWindow():
         #         gathererlist[1].getdirection(afood))
         #     self.custominfoHUD( txt1 + 'degrees wrt ' + gathererlist[1]._name)
         # self.gameDisplay.blit(self.fog,[0,0])
+
+
         pygame.display.update()
 
     def updateFoodOnBoard(self, food):
         count = food._uniqueID
-        unitsize = 2
+ 
         if food._active:
-            size = food._amount * unitsize + len(food._boost) * unitsize*2
+            size =int ( food._amount * self.unitsize + len(food._boost) * self.unitsize*2 )
         else:
-            size = unitsize
+            size = int (self.unitsize)
         # color1 = self.colors[(count) % len(self.colors)]
         color1 = self.foodcolor[food._foodtype]
         intpos = [int(pos) for pos in food._position]
@@ -125,11 +134,13 @@ class GameWindow():
 
 
     def updateGathererOnBoard(self,gatherer):
+        innerradius = int(self.unitsize * 2)
+        outerradius = int(self.unitsize * 7)
         count = gatherer._uniqueID
         color1 = self.colors[(count) % len(self.colors)]
         color2 = self.colors[(count + 1) % len(self.colors)]
         intpos = [int(pos) for pos in gatherer._position]
-        dirlenscale = 15
+        dirlenscale = int(self.unitsize * 7)
         dirtippos = [
             int(pos + gatherer._direction[idx] * dirlenscale)
             for idx, pos in enumerate(gatherer._position)
@@ -141,13 +152,16 @@ class GameWindow():
             str(gatherer._name), False, Colors.white)
 
         pygame.gfxdraw.filled_circle(self.gameDisplay, intpos[0],
-                                        intpos[1], 15, color1)
+                                        intpos[1], outerradius, color1)
         pygame.gfxdraw.filled_circle(self.gameDisplay, intpos[0],
-                                        intpos[1], 5, color2)
+                                        intpos[1], innerradius, color2)
         pygame.gfxdraw.line(self.gameDisplay, intpos[0], intpos[1],
                             dirtippos[0], dirtippos[1], color2)
-        pygame.gfxdraw.circle(self.gameDisplay, intpos[0], intpos[1],
-                              gatherer._visionRange, color1+[120])
+        # pygame.gfxdraw.circle(self.gameDisplay, intpos[0], intpos[1],
+        #                       gatherer._visionRange, color1+[120])
+                              
+        pygame.gfxdraw.filled_circle(self.fog, intpos[0],
+                                        intpos[1], gatherer._visionRange, Colors.black)
         self.gameDisplay.blit(statustext,
                                 (gatherer._position[0], gatherer._position[1]))
         self.gameDisplay.blit(
@@ -160,6 +174,7 @@ class GameWindow():
 
     def fatigueinfoBar(self,gathererlist):
         gathererlist.sort(key=lambda x: x._score,reverse = True)
+        ybezel = 20
         xbase = Rules.Map.bounds[0][1]+20
         for idx,gatherer in enumerate(gathererlist):
             count = gatherer._uniqueID
@@ -169,7 +184,7 @@ class GameWindow():
             datatext = self.HUDfont.render('%d'% (gatherer._score), False, Colors.black)
 
             h = 25
-            ybase = idx * (h + 5)
+            ybase = idx * (h + 5) + ybezel
 
 
             pygame.draw.rect(self.gameDisplay, Colors.black,

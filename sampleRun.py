@@ -2,7 +2,7 @@ from era import Era
 from entities import State,Task,Food,Gatherer
 from rules import Rules
 
-class sampleHunt():
+class Hunt():
     def __init__(self,gatherercount = 3, 
     startingfoodcount = None, 
     foodregrowthperiod = None):
