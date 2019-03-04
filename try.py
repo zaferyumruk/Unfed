@@ -65,7 +65,7 @@ def runfromhatefuleyes_ifcloseandnotbeaten(self):
 
 
 
-gathering = Gathering(gatherercount=23)
+gathering = Gathering(gatherercount=4)
 
 gathering.foodrespawntickperiod = 10
 gathering.tickrate = 60

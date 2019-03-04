@@ -1,7 +1,7 @@
 import pygame
 from pygame import gfxdraw
 import numpy as np
-from entities import Foodtype 
+from entities import Foodtype
 
 from common import checkStrConvert
 from rules import Rules
@@ -35,22 +35,30 @@ class GameWindow():
         ]
         self.gameDisplay = pygame.display.set_mode(self.windowsize)
         self.gameDisplay.fill(Colors.black)
-        
+
         pygame.display.set_caption(caption)
 
 
-        self.unitsize = 1.8
+        self.unitsize = Rules.unitsize
         self.acttop = bounds[0][0]
         self.actleft = bounds[1][0]
         self.actheight = bounds[0][1] - self.acttop
         self.actwidth = bounds[1][1] - self.actleft
         self.activerect = [self.acttop,self.actleft,self.actheight,self.actwidth]
 
-        
+
         self.bordercolor = Colors.darkgrey
         self.borderxbase = self.actleft+self.actwidth
         self.borderybase = self.actleft+self.actwidth
         self.borderwidth = self.windowsize[0] - self.actwidth
+
+        self.watchedattrs = [
+            '_foodsknowncount', '_fatigue', '_state', '_backpack',
+            '_stunnedleft', '_attackcd', '_score', '_currenttask'
+        ]
+        self.infoHUDhy = 15
+        self.infoHUDhx = 120
+        self.infoHUDystart = self.windowsize[1] - 25
 
         self.fog = pygame.Surface(Rules.Map.size)
         self.playzone = pygame.Surface(Rules.Map.size)
@@ -95,15 +103,17 @@ class GameWindow():
             # dudecount = dudecount + 1
             # self.infoHUD(dude, dudecount)
 
+        self.infoHUD(gathererlist)
+
         self.fatigueinfoBar(gathererlist)
-        
+
         self.fog.set_alpha(30,2)
-        
+
         self.gameDisplay.blit(self.playzone,[self.acttop,self.actleft])
         self.gameDisplay.blit(self.fog,[self.acttop,self.actleft])
 
         #CUSTOM DEBUG TEXT
-        
+
         # txt1 = gathererlist[0]._name + ' facing ' + gathererlist[-1]._name + 'with '
         # self.custominfoHUD(txt1 + str(gathererlist[-1].getfacing(gathererlist[0])) + ' degrees')
 
@@ -120,7 +130,7 @@ class GameWindow():
 
     def updateFoodOnBoard(self, food):
         count = food._uniqueID
- 
+
         if food._active:
             size =int ( food._amount * self.unitsize + len(food._boost) * self.unitsize*2 )
         else:
@@ -170,7 +180,7 @@ class GameWindow():
                             dirtippos[0], dirtippos[1], color2)
         # pygame.gfxdraw.circle(self.gameDisplay, intpos[0], intpos[1],
         #                       gatherer._visionRange, color1+[120])
-                              
+
         pygame.gfxdraw.filled_circle(self.fog, intpos[0],
                                         intpos[1], gatherer._visionRange, Colors.black)
         self.playzone.blit(statustext,
@@ -205,7 +215,7 @@ class GameWindow():
             if barvalue != 0:
                 pygame.draw.rect(self.gameDisplay, color1,
                                     [xbase, ybase, barvalue, 25], 0)
-            
+
             self.gameDisplay.blit(nametext, (xbase+10, ybase))
             self.gameDisplay.blit(datatext, (xbase+120, ybase))
 
@@ -213,18 +223,20 @@ class GameWindow():
     def drawborder(self):
         pygame.draw.rect(self.gameDisplay, self.bordercolor,[self.borderxbase, self.borderybase, self.actheight, self.borderwidth], 0)
 
-    def infoHUD(self, dude=None, count=0):
-        watchedattrs = [
-            '_foodsknowncount', '_fatigue', '_state', '_backpack',
-            '_stunnedleft', '_attackcd', '_score', '_currenttask'
-        ]
-        hy = 15
-        hx = 120
-        ystart = self.windowsize[1] - 25
-        xstart = hx * (count + 1)
-        if dude is not None:
-            for attrname in watchedattrs:
-                attr = getattr(dude, attrname)
+    def infoHUD(self, gathererlist):
+        drawsurface = self.gameDisplay
+        for attrname in self.watchedattrs:
+            self.infoHUDxstart = self.infoHUDhx
+            datatext = self.infofont.render(
+                str(attrname), False, Colors.black)
+            drawsurface.blit(datatext,
+                             (self.infoHUDxstart, self.infoHUDystart))
+            self.infoHUDystart = self.infoHUDystart - self.infoHUDhy
+
+        for idx, gatherer in enumerate(gathererlist):
+            self.infoHUDxstart = self.infoHUDhx * (idx + 1)
+            for attrname in self.watchedattrs:
+                attr = getattr(gatherer, attrname)
                 if (type(attr) is list) and len(attr)>0 and (checkStrConvert(attr[0],float)):
                     bb = '%.2f:' * len(attr)
                     datatext = self.infofont.render(bb % tuple(attr), False,
@@ -235,14 +247,10 @@ class GameWindow():
                 else:
                     datatext = self.infofont.render(
                         str(attr), False, Colors.black)
-                self.gameDisplay.blit(datatext, (xstart, ystart))
-                ystart = ystart - hy
+                drawsurface.blit(datatext,
+                                 (self.infoHUDxstart, self.infoHUDystart))
+                self.infoHUDystart = self.infoHUDystart - self.infoHUDhy
             datatext = self.infofont.render(
-                str(dude._name), False, Colors.black)
-            self.gameDisplay.blit(datatext, (xstart, ystart))
-        else:
-            for attrname in watchedattrs:
-                datatext = self.infofont.render(
-                    str(attrname), False, Colors.black)
-                self.gameDisplay.blit(datatext, (xstart, ystart))
-                ystart = ystart - hy
+                str(gatherer._name), False, Colors.black)
+            drawsurface.blit(datatext,
+                             (self.infoHUDxstart, self.infoHUDystart))

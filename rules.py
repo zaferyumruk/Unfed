@@ -21,6 +21,7 @@ class Rules():
     foodrespawntickperiod = 30
     startingfoodcount = 56
     spawnedfoodcap = 150
+    unitsize = 2.5
 
 
     class Fatiguedrain():

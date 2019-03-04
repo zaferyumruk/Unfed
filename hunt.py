@@ -49,6 +49,7 @@ def defaultTraining(self):
             self.assignTask(Task.collect, self.closestfood())
         else:
             self.assignTask(Task.wander)
+    # if attack is on cd two gatherers may stuck into each other until one of them hits and leave
     elif (self.checkstate(gat1) != State.beaten) and (self.foodcarried(gat1)):
         self.assignTask(Task.attackmove, gat1)
     else:
