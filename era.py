@@ -3,7 +3,7 @@ import numpy as np
 import random
 from collections import defaultdict
 
-from surface import GameWindow
+from surface import GameWindow,GathererSprite
 from entities import Gatherer, Food, Task, State
 from common import checkInRange, maxnorm, checkBoundaryList
 from rules import Rules
@@ -12,7 +12,7 @@ class Era():
     def __init__(self):
 
         pygame.init()
-        
+
         self.windowsize = Rules.windowsize
         self.bounds = Rules.Map.bounds
         self.surface = GameWindow(windowsize=self.windowsize,bounds=self.bounds)
@@ -31,6 +31,7 @@ class Era():
         self.foodgrowing = True
 
         self.gathererlist = []
+        self.gathererspritelist = {} # ! should not be here, its something pure graphical
         self.foodlist = []
 
         self._entityIDdict = {}
@@ -44,11 +45,11 @@ class Era():
         self.foodlist.append(food)
         self._entityIDdict[food._uniqueID] = food
 
-    def addGatherer(self, gatherer):
+    def addGatherer(self, gatherer, skin=0):
         self.gathererlist.append(gatherer)
+        self.gathererspritelist[gatherer] = GathererSprite(gatherer,characterskin=skin)
         self._entityIDdict[gatherer._uniqueID] = gatherer
 
-    # ! Implement
     def removeFood(self, idx):
         self._entityIDdict.pop(self.foodlist[idx]._uniqueID)
         self.foodlist.pop(idx)
@@ -93,7 +94,7 @@ class Era():
         while self.running:
             # step = step + 1
             for event in pygame.event.get():
-                
+
                 if event.type == pygame.QUIT:
                     self.running = False
                 if event.type == pygame.KEYDOWN:

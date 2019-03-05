@@ -1,5 +1,5 @@
 import pygame
-header = 'out\\'
+header = 'sprites\\out\\'
 # header = ''
 frames = []
 frames.append(pygame.image.load(header + "c3a2f1.png"))

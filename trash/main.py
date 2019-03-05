@@ -7,7 +7,7 @@ from pycallgraph.output import GraphvizOutput
 
 def assignRandomCollect_aggresive1(self):
     distratio = 1
-    if self.state == State.idle or self.state == State.moving:
+    if self.state == State.idle or self.state == State.wandering:
         f1 = self.closestfood()
         gat1 = self.closestgatherer()
         if (f1 is not None):
@@ -49,7 +49,7 @@ def assignRandomCollect_aggresive2(self):
 
 def assignRandomCollect_aggresive3(self):
     distratio = 3
-    if self.state == State.idle or self.state == State.moving:
+    if self.state == State.idle or self.state == State.wandering:
         f1 = self.closestfood()
         gat1 = self.closestgatherer()
         if (f1 is not None):

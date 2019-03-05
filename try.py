@@ -1,4 +1,4 @@
-from gathering import Gathering
+from gathering import Gathering, defaultTraining
 from entities import State,Task, Foodtype
 
 
@@ -65,17 +65,17 @@ def runfromhatefuleyes_ifcloseandnotbeaten(self):
 
 
 
-gathering = Gathering(gatherercount=4)
+gathering = Gathering(gatherercount=2)
 
 gathering.foodrespawntickperiod = 10
 gathering.tickrate = 60
 gathering.spawnedfoodcap = 200
 
 
-gathering.addGatherer('zaf')
+gathering.addGatherer('zaf',14)
 gathering.assign2Gatherer('zaf',appleLover)
 
+gathering.addGatherer('garfi', 12)
+gathering.assign2Gatherer('garfi', defaultTraining)
+
 gathering.begin()
-
-
-

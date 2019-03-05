@@ -60,6 +60,13 @@ def angle_vector(v):
     return np.arctan2(v[1], v[0]) * 180 / np.pi
 
 
+def angle_vector_custom(v):
+    # return ((np.arctan2(v[1], v[0]) * 180 / np.pi + 180) + 90) % 360 - 180
+    # return (angle_vector(v) - 90.0) % 360.0 - 180.0
+    return (angle_vector(v)+ 180 + 90) % 360 - 180
+
+
+
 def checkBoundarySingle(pos,bounds):
     if pos>bounds[1] or pos<bounds[0]:
         return False

@@ -3,8 +3,8 @@ from entities import State,Task,Food,Gatherer
 from rules import Rules
 
 class Gathering():
-    def __init__(self,gatherercount = 3, 
-    startingfoodcount = None, 
+    def __init__(self,gatherercount = 3,
+    startingfoodcount = None,
     foodregrowthperiod = None):
 
         self.era = Era()
@@ -25,9 +25,10 @@ class Gathering():
             self.era.addGatherer(Gatherer(name=name, startingpos=self.era.getRandomPos()))
             self.era.assign2Gatherer(name, defaultTraining)
 
-    def addGatherer(self,name):
-        self.era.addGatherer(Gatherer(name=name, startingpos=self.era.getRandomPos()))
-    
+    def addGatherer(self,name,skin=1):
+        self.era.addGatherer(
+            Gatherer(name=name, startingpos=self.era.getRandomPos()), skin)
+
     def assign2Gatherer(self,name,instructions):
         self.era.assign2Gatherer(name, instructions)
 
@@ -53,7 +54,3 @@ def defaultTraining(self):
         self.assignTask(Task.attackmove, gat1)
     else:
         self.assignTask(Task.wander)
-
-
-
-

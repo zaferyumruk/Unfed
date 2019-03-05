@@ -1,8 +1,19 @@
 import numpy as np
 from enum import Enum
-
 from rules import Rules
-from common import unitvec, angle_between_vectors, angle_vector, checkBoundarySingle
+from common import unitvec, angle_between_vectors, angle_vector, checkBoundarySingle, angle_vector_custom
+
+
+class Direction(Enum):
+    north = 1
+    northwest = 2
+    west = 3
+    southwest = 4
+    south = 5
+    southeast = 6
+    east = 7
+    northeast = 8
+
 
 class ContainerState(Enum):
     empty = 1
@@ -19,7 +30,7 @@ class Task(Enum):
 class State(Enum):
     idle = 1
     following = 2
-    moving = 3
+    wandering = 3
     charging = 4
     fleeing = 5
     lookingaround = 6
@@ -159,8 +170,8 @@ class Gatherer(Entity):
         self._task2func[self._currenttask]()
 
     def _taskfollow(self, target=None):
-        self._state = State.following
         if target is None:
+            self._state = State.following
             target = self._taskvariables[0]
             if target is None:
                 self._taskcancel()
@@ -198,7 +209,7 @@ class Gatherer(Entity):
         self._taskvariables = []
 
     def _taskwander(self):
-        self._state = State.moving
+        self._state = State.wandering
         if len(self._taskvariables) and (type(self._taskvariables[0]) is int or
                                          type(self._taskvariables[0]) is float):
             apprxdirchanges = self._taskvariables[0]
@@ -211,7 +222,7 @@ class Gatherer(Entity):
         self._step()
 
     def _taskcollect(self):
-        self._state = State.moving
+        self._state = State.collecting
         food = self._taskvariables[0]
         if food is None:
             self._taskcancel()
@@ -375,7 +386,9 @@ class Gatherer(Entity):
         return (distance,direction)
 
     def getdirection(self,entity):
-        return (angle_vector(np.subtract(entity._position,self._position)) - 90.0)%360.0 -180.0
+        # return (angle_vector(np.subtract(entity._position,self._position)) - 90.0)%360.0 -180.0
+        return angle_vector_custom(
+            np.subtract(entity._position, self._position))
 
     def getfacing(self,gatherer):
         spatialvec = np.subtract(self._position,gatherer._position)
@@ -468,4 +481,3 @@ class Gatherer(Entity):
         node = self._position
         dist_2 = np.sum((nodes - node)**2, axis=1)
         return dist_2
-
