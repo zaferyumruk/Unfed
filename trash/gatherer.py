@@ -146,8 +146,6 @@ class Gatherer(Entity):
         self.stunnedleft = 0 # counter
         self.attackcd = 0  # counter
 
-           
-
         self.task2func = {
             None: lambda: None,
             Tasks.follow: self.taskfollow,
