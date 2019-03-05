@@ -68,7 +68,7 @@ class GameWindow():
         self.fog = pygame.Surface(Rules.Map.size)
         self.playzone = pygame.Surface(Rules.Map.size)
 
-        self.foodcolor = {Foodtype.berry: Colors.red,
+        self.foodcolor = {Foodtype.raspberry: Colors.red,
             Foodtype.apple : Colors.green,
             Foodtype.pineapple : Colors.yellow}
 
@@ -120,10 +120,9 @@ class GameWindow():
 
         #CUSTOM DEBUG TEXT
         # angle = ((angle_vector(gathererlist[0]._direction) + 180)+90)%360-180
-        angle = angle_vector_custom(gathererlist[0]._direction)
-        txt = 'direction:'+str(gathererlist[0]._direction) + ' angle:' + str(angle)
-
-        self.custominfoHUD(txt)
+        # angle = angle_vector_custom(gathererlist[0]._direction)
+        # txt = 'direction:'+str(gathererlist[0]._direction) + ' angle:' + str(angle)
+        # self.custominfoHUD(txt)
 
         # txt1 = gathererlist[0]._name + ' facing ' + gathererlist[-1]._name + 'with '
         # self.custominfoHUD(txt1 + str(gathererlist[-1].getfacing(gathererlist[0])) + ' degrees')
@@ -156,7 +155,7 @@ class GameWindow():
                 self.playzone,
                 [intpos[0] - size / 2, intpos[1] - size / 2, size, size],
                 color1)
-            self.playzone.blit(nametext, (intpos[0], intpos[1]))
+            # self.playzone.blit(nametext, (intpos[0], intpos[1]))
         else:
             pygame.gfxdraw.box(
                 self.playzone,
@@ -284,6 +283,17 @@ def preloadStateSprites():
     return statespritelist
 
 
+def preloadFoodSprites():
+    foodspritelist = {}
+    basedir = 'sprites\\states'
+    iconlist = os.listdir(basedir)  # returns list
+    for icon in iconlist:
+        foodtypename = ''.join(icon.split('.')[0:-1])
+        foodtype = getattr(State, foodtypename)
+        foodspritelist[foodtype] = pygame.transform.scale(
+            pygame.image.load(basedir + '\\' + icon), (30, 30))
+    return foodspritelist
+
 class GathererSprite():
     def __init__(self, gatherer, characterskin = 1, seq2frame=[0, 1, 2, 1], stride=6):
         self.gatherer = gatherer
@@ -331,10 +341,8 @@ class GathererSprite():
             self.activespritelist[self.activeframe],
             (intpos[0] - self.charsprite_halfsize[0],
              intpos[1] - self.charsprite_halfsize[1]))  #intpos replace
-        surface.blit(
-            namelabel,
-            (intpos[0] - self.charsprite_halfsize[0], intpos[1] -
-             self.charsprite_halfsize[1] - namelabel.get_height()))  #intpos replace
+        surface.blit(namelabel, (intpos[0] - namelabel.get_width()/2,
+                                 intpos[1] - namelabel.get_height()/2 - self.charsprite_halfsize[1]-3))  #intpos replace
 
 
     def updateactiveframe(self):

@@ -6,7 +6,7 @@ class Rules():
     basespeed = 90.0 / tickrate  #rate, pixels
     startingfatigue = 400.0  #value
     eatspeed = 1.0 / tickrate  #rate
-    foodspawnchance = maxnorm([50, 40, 5])  #value
+    foodspawnchance = maxnorm([20, 12, 7])  #value
     bashstunspan = 4.0 * tickrate  #timespan
     scoremultiplier1 = 10  #value during game per food consumed
     scoremultiplier2 = 2  #value when game over per food left

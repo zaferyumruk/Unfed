@@ -46,7 +46,7 @@ class Boost(Enum):
     ironlungs = 5
 
 class Foodtype(Enum):
-    berry = 1
+    raspberry = 1
     apple = 2
     pineapple = 3
 
@@ -75,7 +75,7 @@ class Food(Entity):
             self._foodtype = foodtype
 
     def _assignfoodatts(self):
-        if self._foodtype == Foodtype.berry:
+        if self._foodtype == Foodtype.raspberry:
             self._amount = 5
             self._boost = []
         elif self._foodtype == Foodtype.apple:
