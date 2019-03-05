@@ -112,7 +112,7 @@ class GameWindow():
 
         # self.infoHUD(gathererlist)
 
-        self.fatigueinfoBar(gathererlist)
+        self.fatigueinfoBar(gathererlist,gameover)
 
         self.fog.set_alpha(30,2)
 
@@ -210,16 +210,20 @@ class GameWindow():
         customtext = self.labelfont.render(text, False, Colors.black)
         self.gameDisplay.blit(customtext, (200, 200))
 
-    def fatigueinfoBar(self,gathererlist):
-        gathererlist.sort(key=lambda x: x._score,reverse = True)
+    def fatigueinfoBar(self,gathererlist,gameover):
+        if gameover:
+            gathererlist.sort(key=lambda x: x._score,reverse = True)
         ybezel = 20
-        xbase = Rules.Map.bounds[0][1]+35
+        xbase = Rules.Map.bounds[0][1]+35+15
         for idx,gatherer in enumerate(gathererlist):
             count = gatherer._uniqueID
             color1 = self.colors[(count) % len(self.colors)]
 
             nametext = self.HUDfont.render(gatherer._name, False, Colors.white)
-            datatext = self.HUDfont.render('%d'% (gatherer._score), False, Colors.white)
+            datatext = self.HUDfont.render('%d' % (gatherer._score), False,
+                                           Colors.white)
+            bagsize = self.HUDfont.render('%d' % (gatherer.foodcarried(gatherer)), False,
+                                          Colors.red)
 
             h = 30
             ybase = idx * (h + 5) + ybezel
@@ -235,7 +239,9 @@ class GameWindow():
 
             self.gameDisplay.blit(nametext, (xbase+10, ybase))
             self.gameDisplay.blit(datatext, (xbase+120, ybase))
-            self.gameDisplay.blit(self.statesprites[gatherer._state], (xbase-33, ybase-3))
+            self.gameDisplay.blit(self.statesprites[gatherer._state],
+                                  (xbase - 33, ybase - 3))
+            self.gameDisplay.blit(bagsize, (xbase - 43, ybase))
 
 
 

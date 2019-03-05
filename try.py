@@ -71,7 +71,7 @@ gathering.foodrespawntickperiod = 10
 gathering.tickrate = 60
 gathering.spawnedfoodcap = 200
 
-
+# characterskin 0-15
 gathering.addGatherer('zaf',14)
 gathering.assign2Gatherer('zaf', runfromhatefuleyes)
 

@@ -7,6 +7,7 @@ class Rules():
     startingfatigue = 400.0  #value
     eatspeed = 1.0 / tickrate  #rate
     foodspawnchance = maxnorm([20, 12, 7])  #value
+    foodsamount = [5,8,13]
     bashstunspan = 4.0 * tickrate  #timespan
     scoremultiplier1 = 10  #value during game per food consumed
     scoremultiplier2 = 2  #value when game over per food left
@@ -17,7 +18,7 @@ class Rules():
     overlapdistance = 5.0
     apprxdirchanges = 3  # utilized in taskwander approximate number of direction changes per 10 secs
     apprxdirchanges_unittime = 10 # seconds
-    visionrange = 150
+    visionrange = 175
     foodrespawntickperiod = 30
     startingfoodcount = 56
     spawnedfoodcap = 150
