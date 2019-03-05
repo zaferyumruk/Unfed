@@ -74,20 +74,24 @@ class Food(Entity):
         else:
             self._foodtype = foodtype
 
-    def _assignfoodatts(self):
-        if self._foodtype == Foodtype.raspberry:
-            self._amount = 5
-            self._boost = []
-        elif self._foodtype == Foodtype.apple:
-            self._amount = 8
-            self._boost = []
-        elif self._foodtype == Foodtype.pineapple:
-            self._amount = 13
+    def _getfoodatts(self,foodtype):
+        if foodtype == Foodtype.raspberry:
+            amount = 5
+            boost = []
+        elif foodtype == Foodtype.apple:
+            amount = 8
+            boost = []
+        elif foodtype == Foodtype.pineapple:
+            amount = 13
+            boost = []
             # idx = np.random.choice(np.arange(0, len(list(Boost))))
-            self._boost = []
         else:
-            self._boost = []
-            self._amount = 0
+            boost = []
+            amount = 0
+        return (amount,boost)
+
+    def _assignfoodatts(self):
+        [self._amount,self._boost] = self._getfoodatts(self._foodtype)
 
 
 class Gatherer(Entity):

@@ -65,7 +65,7 @@ def runfromhatefuleyes_ifcloseandnotbeaten(self):
 
 
 
-gathering = Gathering(gatherercount=2)
+gathering = Gathering(gatherercount=6)
 
 gathering.foodrespawntickperiod = 10
 gathering.tickrate = 60
@@ -73,7 +73,7 @@ gathering.spawnedfoodcap = 200
 
 
 gathering.addGatherer('zaf',14)
-gathering.assign2Gatherer('zaf',appleLover)
+gathering.assign2Gatherer('zaf', runfromhatefuleyes)
 
 gathering.addGatherer('garfi', 12)
 gathering.assign2Gatherer('garfi', defaultTraining)

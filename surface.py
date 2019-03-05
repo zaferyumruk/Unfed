@@ -1,7 +1,7 @@
 from pygame import gfxdraw
 import numpy as np
 import math, os, pygame
-from entities import Foodtype, Direction, State
+from entities import Foodtype, Direction, State, Food
 
 from common import checkStrConvert, angle_vector, angle_vector_custom
 from rules import Rules
@@ -48,6 +48,7 @@ class GameWindow():
         self.activerect = [self.acttop,self.actleft,self.actheight,self.actwidth]
 
         self.statesprites = preloadStateSprites()
+        self.foodsprites = preloadFoodSprites()
 
         self.bordercolor = Colors.darkgrey
         self.borderxbase = self.actleft+self.actwidth
@@ -151,10 +152,12 @@ class GameWindow():
         nametext = self.labelfont.render(food._foodtype.name, False,
                                     Colors.black)
         if food._active:
-            pygame.gfxdraw.box(
-                self.playzone,
-                [intpos[0] - size / 2, intpos[1] - size / 2, size, size],
-                color1)
+            # pygame.gfxdraw.box(
+            #     self.playzone,
+            #     [intpos[0] - size / 2, intpos[1] - size / 2, size, size],
+            #     color1)
+            self.playzone.blit(self.foodsprites[food._foodtype], (intpos[0], intpos[1]))
+
             # self.playzone.blit(nametext, (intpos[0], intpos[1]))
         else:
             pygame.gfxdraw.box(
@@ -285,13 +288,19 @@ def preloadStateSprites():
 
 def preloadFoodSprites():
     foodspritelist = {}
-    basedir = 'sprites\\states'
+    basedir = 'sprites\\foods'
     iconlist = os.listdir(basedir)  # returns list
+    basesize = (3,3)
     for icon in iconlist:
         foodtypename = ''.join(icon.split('.')[0:-1])
-        foodtype = getattr(State, foodtypename)
+        try:
+            foodtype = getattr(Foodtype, foodtypename)
+        except:
+            continue
+        amount, _ = Food()._getfoodatts(foodtype)
+        size = [el*amount for el in basesize]
         foodspritelist[foodtype] = pygame.transform.scale(
-            pygame.image.load(basedir + '\\' + icon), (30, 30))
+            pygame.image.load(basedir + '\\' + icon), size)
     return foodspritelist
 
 class GathererSprite():
@@ -343,7 +352,6 @@ class GathererSprite():
              intpos[1] - self.charsprite_halfsize[1]))  #intpos replace
         surface.blit(namelabel, (intpos[0] - namelabel.get_width()/2,
                                  intpos[1] - namelabel.get_height()/2 - self.charsprite_halfsize[1]-3))  #intpos replace
-
 
     def updateactiveframe(self):
         if self.isgathererstationary():
