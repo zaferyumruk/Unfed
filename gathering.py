@@ -44,13 +44,13 @@ def defaultTraining(self):
         fd = self.getdistance(f1)
         gd = self.getdistance(gat1)
         if (gd * distratio < fd) and (self.checkstate(gat1) != State.beaten
-                                    ) and (self.foodcarried(gat1)):
+                                    ) and (self.foodcarried(gat1)) and self.readytoattack():
             self.assignTask(Task.attackmove, gat1)
         elif len(self.knownfoods()) > 0:
             self.assignTask(Task.collect, self.closestfood())
         else:
             self.assignTask(Task.wander)
-    elif (self.checkstate(gat1) != State.beaten) and (self.foodcarried(gat1)):
+    elif (self.checkstate(gat1) != State.beaten) and (self.foodcarried(gat1)) and self.readytoattack():
         self.assignTask(Task.attackmove, gat1)
     else:
         self.assignTask(Task.wander)

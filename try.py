@@ -36,7 +36,10 @@ def attackorcollect(self):
         if self.getdistance(closestfood)<self.getdistance(closestgatherer):
             self.assignTask(Task.collect, closestfood)
             return
-    self.assignTask(Task.attackmove, closestgatherer)
+    if self.checkstate(closestgatherer) != State.beaten:
+        self.assignTask(Task.attackmove, closestgatherer)
+    else:
+        self.assignTask(Task.wander,20)
 
 def runfromhatefuleyes(self):
     gatherers = self.visiblegatherers()
@@ -67,15 +70,19 @@ def runfromhatefuleyes_ifcloseandnotbeaten(self):
 
 gathering = Gathering(gatherercount=6)
 
-gathering.foodrespawntickperiod = 10
-gathering.tickrate = 60
-gathering.spawnedfoodcap = 200
+gathering.addGatherer('afguc',11)
+gathering.assign2Gatherer('afguc', attackorcollect)
+
+
+# gathering.foodrespawntickperiod = 10
+# gathering.tickrate = 60
+# gathering.spawnedfoodcap = 200
 
 # characterskin 0-15
-gathering.addGatherer('zaf',14)
-gathering.assign2Gatherer('zaf', runfromhatefuleyes)
+# gathering.addGatherer('zaf',8)
+# gathering.assign2Gatherer('zaf', attackorcollect)
 
-gathering.addGatherer('garfi', 12)
-gathering.assign2Gatherer('garfi', defaultTraining)
+# gathering.addGatherer('garfi', 12)
+# gathering.assign2Gatherer('garfi', defaultTraining)
 
 gathering.begin()

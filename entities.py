@@ -305,8 +305,12 @@ class Gatherer(Entity):
             other._stunnedleft = Rules.bashstunspan * self._modifier[
                 'stuntime'] * other._modifier['stunnedtime']
 
-            self._storeFood(other._backpack)
-            other._backpack = 0.0
+            if other._backpack > Rules.bashstolenfood:
+                self._storeFood(Rules.bashstolenfood)
+                other._backpack = other._backpack - Rules.bashstolenfood
+            else:
+                self._storeFood(other._backpack)
+                other._backpack = 0.0
 
             success = True
         return success
@@ -345,6 +349,12 @@ class Gatherer(Entity):
     # ! gatherersknown should be replaced with gatherersvisible when needed
     def isvisible(self,entity):
         return (entity in self._foodsvisible or entity in self._gatherersvisible)
+
+    def readytoattack(self):
+        if self._attackcd == 0:
+            return True
+        else:
+            return False
 
     def _step(self):
         '''uses speed and current direction'''

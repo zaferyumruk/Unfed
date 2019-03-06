@@ -9,6 +9,7 @@ class Rules():
     foodspawnchance = maxnorm([20, 12, 7])  #value
     foodsamount = [5,8,13]
     bashstunspan = 4.0 * tickrate  #timespan
+    bashstolenfood = 20
     scoremultiplier1 = 10  #value during game per food consumed
     scoremultiplier2 = 2  #value when game over per food left
     attackcd = 8.0 * tickrate  #timespan
@@ -20,9 +21,10 @@ class Rules():
     apprxdirchanges_unittime = 10 # seconds
     visionrange = 175
     foodrespawntickperiod = 30
-    startingfoodcount = 56
-    spawnedfoodcap = 150
+    startingfoodcount = 35
+    spawnedfoodcap = 100
     unitsize = 2.5
+    
 
 
     class Fatiguedrain():
@@ -33,7 +35,10 @@ class Rules():
         lookaround = 3  #per action
 
     class Map():
-        size = [1024,800]
-        bounds = [[0, 1024], [0, 800]]
+        bezel = 10
+        width = 1024
+        height = 800
+        size = [width-2*bezel,height-2*bezel]
+        bounds = [[0+bezel, width-bezel], [0+bezel, height-bezel]]
         center = [int((boundary[0]+boundary[1]) / 2) for boundary in bounds]
         
