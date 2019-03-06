@@ -92,7 +92,47 @@ def godofwar(self):
     else:
         self.assignTask(Task.wander,20)
 
+def uzungi(self):
+    closestfood = self.closestfood()
+    gatherers = self.visiblegatherers()
+    closestgatherer = self.closestgatherer()
+    
+    if closestfood is not None:
+        self.assignTask(Task.collect,closestfood)
+    else:
+        for gatherer in gatherers:
+            #if self.foodcarried(gatherer)
+            if self.getdistance(gatherer) < 35 and self.getdistance(gatherer) > 25  and self.checkstate(gatherer) != State.beaten:
+                self.assignTask(Task.escape, gatherer)
+                return
+            elif self.getdistance(gatherer) < 25 and self.checkstate(gatherer) != State.beaten:
+                self.assignTask(Task.attackmove, closestgatherer)
+            else:
+                self.assignTask(Task.wander,gatherer)
+
+def attackorcollect(self):
+    closestfood = self.closestfood()
+    closestgatherer = self.closestgatherer()
+   
+    if closestfood is not None:
+        if self.checkfoodtype(closestfood) != Foodtype.raspberry:
+            if self.getdistance(closestfood)<self.getdistance(closestgatherer):
+                self.assignTask(Task.collect, closestfood)
+                return
+        if self.checkstate(closestgatherer) != State.beaten:
+            self.assignTask(Task.attackmove, closestgatherer)
+        else:
+            if self.checkstate(self) == State.idle:
+                 self.assignTask (Task.escape,closestgatherer)
+            self.assignTask(Task.wander,10)
+
 gathering = Gathering(gatherercount=0)
+
+gathering.addGatherer('SSNAKE',2)
+gathering.assign2Gatherer('SSNAKE', attackorcollect)
+
+gathering.addGatherer('ProCrast',11)
+gathering.assign2Gatherer('ProCrast', uzungi)
 
 gathering.addGatherer('seker',6)
 gathering.assign2Gatherer('seker', peace)
@@ -108,5 +148,8 @@ gathering.assign2Gatherer('ICAB', icabTask)
 
 gathering.addGatherer('FrogInBlack',7)
 gathering.assign2Gatherer('FrogInBlack', SKYteamAttack)
+
+gathering.addGatherer('garfi',14)
+gathering.assign2Gatherer('garfi', defaultTraining)
 
 gathering.begin()

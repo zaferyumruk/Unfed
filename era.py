@@ -13,7 +13,7 @@ class Era():
 
         pygame.init()
 
-        self.windowsize = Rules.windowsize
+        self.windowsize = Rules.Map.windowsize
         self.bounds = Rules.Map.bounds
         self.surface = GameWindow(windowsize=self.windowsize,bounds=self.bounds)
         self.startingfoodcount = Rules.startingfoodcount

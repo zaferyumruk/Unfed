@@ -254,10 +254,12 @@ class Gatherer(Entity):
                 self._noticeFood(food)
         self._foodsknowncount = len(self._foodsknown)
 
+    # ! unknown food coming froms somwhere??
     def _forgetFood(self, food):
-        self._foodsknown.remove(food)
-        food._knownby.remove(self)
-        self._foodsknowncount = len(self._foodsknown)
+        if food in self._foodsknown:
+            self._foodsknown.remove(food)
+            food._knownby.remove(self)
+            self._foodsknowncount = len(self._foodsknown)
 
     def _noticeFood(self, food):
         self._foodsknown.append(food)

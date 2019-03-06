@@ -2,7 +2,7 @@ from common import maxnorm
 
 class Rules():
     tickrate = 60
-    windowsize = [1224, 800]
+    # windowsize = Map.windowsize
     basespeed = 90.0 / tickrate  #rate, pixels
     startingfatigue = 400.0  #value
     eatspeed = 1.0 / tickrate  #rate
@@ -36,8 +36,9 @@ class Rules():
 
     class Map():
         bezel = 10
-        width = 1024
-        height = 800
+        windowsize = [1024, 768]
+        width = windowsize[0]-200 # left for fatigue bar etc. 
+        height = windowsize[1]
         size = [width-2*bezel,height-2*bezel]
         bounds = [[0+bezel, width-bezel], [0+bezel, height-bezel]]
         center = [int((boundary[0]+boundary[1]) / 2) for boundary in bounds]
