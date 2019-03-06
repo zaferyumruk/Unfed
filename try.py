@@ -1,8 +1,6 @@
 from gathering import Gathering, defaultTraining
 from entities import State,Task, Foodtype
 
-
-
 def collectclosestFood(self):
     closestfood = self.closestfood()
     if closestfood is not None:
@@ -72,17 +70,5 @@ gathering = Gathering(gatherercount=6)
 
 gathering.addGatherer('afguc',11)
 gathering.assign2Gatherer('afguc', attackorcollect)
-
-
-# gathering.foodrespawntickperiod = 10
-# gathering.tickrate = 60
-# gathering.spawnedfoodcap = 200
-
-# characterskin 0-15
-# gathering.addGatherer('zaf',8)
-# gathering.assign2Gatherer('zaf', attackorcollect)
-
-# gathering.addGatherer('garfi', 12)
-# gathering.assign2Gatherer('garfi', defaultTraining)
 
 gathering.begin()

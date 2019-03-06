@@ -124,8 +124,8 @@ class GameWindow():
         # angle = angle_vector_custom(gathererlist[0]._direction)
         # txt = 'direction:'+str(gathererlist[0]._direction) + ' angle:' + str(angle)
         
-        txt = str(gathererlist[0].readytoattack())
-        self.custominfoHUD(txt)
+        # txt = str(gathererlist[0].readytoattack())
+        # self.custominfoHUD(txt)
 
         # txt1 = gathererlist[0]._name + ' facing ' + gathererlist[-1]._name + 'with '
         # self.custominfoHUD(txt1 + str(gathererlist[-1].getfacing(gathererlist[0])) + ' degrees')
