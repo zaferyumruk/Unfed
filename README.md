@@ -1,7 +1,7 @@
 # Unfed
 Train your gatherers, dominate the fertile field!
 
-This is a game where you can "teach" your gatherer to survive among ever growing fruits and other almost-friendly gatherers. This was created for an activity at workplace which was  superfun.
+This is a game where you can "teach" your gatherer to survive among ever growing fruits and other almost-friendly gatherers. This was created for an activity at workplace which ended up being superfun.
 
 ## About the game
 
