@@ -34,7 +34,7 @@ Requires pygame and numpy\
 Run thegathering_basic.py to test
 
 ## My own experience
-Delivered "notes.pdf" and introduced the game to 8 teams consisting of ~30 engineers in total who knows programming but very little about python. Helped them write and test their own doctrine of gathering in ~15 mins. Then put them together to challenge each other. Great fun!
+Handed out "notes.pdf" and introduced the game to 8 teams consisting of ~30 engineers in total who knows programming but very little about python. Helped them write and test their own doctrine of gathering in ~15 mins. Then put them together to challenge each other. Great fun!
 
 ### Credits
 - Icons made by Freepik from www.flaticon.com  
