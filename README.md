@@ -11,7 +11,7 @@ Or they can be a brute.. stun others and steal their food!\
 Every action tires gatherers till they.. fall asleep.\
 Those that DIGESTED the most food prevails the gathering :)
 
-Every gatherer has a line of sight. They do not forget the fruit they see. But what they remember may be long gone (if there is at least one gatherer knows a location of a fruit which he/she has no sight to but recently collected by someone else, fruit appears as a dot.. of disappointment)
+Every gatherer has a line of sight. They do not forget the fruit they see. But what they remember may be long gone (if there is at least one gatherer knows a location of a fruit which he/she has no sight to but is recently collected by someone else, fruit appears as a dot.. of disappointment)
 
 ## The Interface
 
