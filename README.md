@@ -6,10 +6,10 @@ This is a game where you can "teach" your gatherer to survive among ever growing
 ## About the game
 
 Foods spawn, gatherers collect..\
-They can collect and fill their bags,\
-Or they can be a brute.. stun others and steal their food!\
+Gatherers can collect and fill their bags.\
+Or they can be brutes.. stun others and gather from others' backpacks.\
 Every action tires gatherers till they.. fall asleep.\
-Those that DIGESTED the most food prevails the gathering :)
+whoever DIGESTED the most food prevails the gathering :)
 
 Every gatherer has a line of sight. They do not forget the fruit they see. But what they remember may be long gone (if there is at least one gatherer knows a location of a fruit which he/she has no sight to but is recently collected by someone else, fruit appears as a dot.. of disappointment)
 
@@ -26,7 +26,7 @@ Every gatherer has a line of sight. They do not forget the fruit they see. But w
 [Mouse Right Click], you are a merciful god! Right!? (start/stop fruit growth)
 
 ## How to teach'em?? 
-Please refer to **thegathering_*.py** & **doc\notes.pdf** 
+You can code with very simple syntax and combine high level actions. Please refer to **thegathering_*.py** & **doc\notes.pdf** 
 
 ## How to run?
 Tested on python 3.6\
